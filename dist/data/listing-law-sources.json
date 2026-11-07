@@ -1,0 +1,112 @@
+{
+  "AB507": {
+    "title": "AB 507 \u00b7 Office to Housing Conversion Act",
+    "url": "https://leginfo.legislature.ca.gov/faces/billTextClient.xhtml?bill_id=202520260AB507",
+    "check": "Operative 1 July 2026. Verify the existing use, infill, unit affordability, labour, site and historic-resource tests. Older age triggers the applicable historic review, not automatic rejection. Hotels and mixed-use buildings containing hotel use must satisfy the statutory five-year discontinuation test."
+  },
+  "SB6": {
+    "title": "SB 6 \u00b7 Middle Class Housing Act",
+    "url": "https://abag.ca.gov/sites/default/files/documents/2025-04/AB-2011-SB-6-Summary-Key-Details-4-2025.pdf",
+    "check": "Confirm that office, retail or parking is allowed, and check site, density and labour requirements. SB 6 establishes a permitted residential use in eligible commercial zones. Ministerial review or a CEQA exemption needs a separate basis."
+  },
+  "AB1490": {
+    "title": "AB 1490 \u00b7 Extremely affordable adaptive reuse",
+    "url": "https://abag.ca.gov/sites/default/files/documents/2025-05/Housing-Project-Processing-Requirements-Reference-Sheets-05122025.pdf",
+    "check": "Verify a residential or commercial building that already allows temporary dwelling or occupancy. Test conversion within the existing envelope, 100% lower-income units and at least 50% very-low-income units, plus affordability and site conditions. Ordinary office occupancy is insufficient."
+  },
+  "AB2011": {
+    "title": "AB 2011 \u00b7 Affordable Housing and High Road Jobs Act",
+    "url": "https://www.hcd.ca.gov/hau/enforcement-authority",
+    "check": "Check the 100% affordable commercial-land route or the mixed-income commercial-corridor route and amendments for mall sites. Confirm frontage, source zoning, industrial adjacency, freeway conditions, affordability and labour. A commercial zoning label alone cannot establish eligibility."
+  },
+  "HOMEKEY": {
+    "title": "Homekey \u00b7 Acquisition and conversion funding",
+    "url": "https://www.hcd.ca.gov/funding/homekey",
+    "check": "Review the applicable notice of funding availability, eligible applicant or public partner, target population and operating plan. A nearby motel conversion is precedent only. An award, active funding round or entitlement has not been established."
+  },
+  "SA_REUSE": {
+    "title": "Santa Ana \u00b7 Adaptive Reuse Ordinance \u00a7\u00a741-1651\u20131652",
+    "url": "https://storage.googleapis.com/proudcity/santaanaca/uploads/2022/03/Adaptive-Reuse-Ord.-6.30.20.pdf",
+    "check": "Confirm a designated incentive area: Midtown SP3, Transit SD84, or the specified North Main or East First corridor segment. Verify pre-1 July 1974 building-code vintage or historic significance, then check minimum unit size, street-front commercial requirements, seismic and fire review."
+  },
+  "SA_P": {
+    "title": "Santa Ana \u00b7 Professional district, \u00a7\u00a741-312\u2013313.5",
+    "url": "https://storage.googleapis.com/proudcity/santaanaca/uploads/2022/03/Professional-P-Handout-7.28.23.pdf",
+    "check": "The base P district lists office and service uses. Establish a separate residential route or overlay before presenting apartments as permitted. Section 41-321\u2019s rule for converting existing residential buildings to professional uses does not establish the reverse conversion."
+  },
+  "SA_SP3": {
+    "title": "Santa Ana \u00b7 Midtown Specific Plan (SP3)",
+    "url": "https://storage.googleapis.com/proudcity/santaanaca/uploads/2022/03/Midtown_Specific_Plan.pdf",
+    "check": "Locate the parcel within the plan and confirm the applicable subarea, adopted amendments and use table. SP3 also falls in the local adaptive-reuse incentive area; building eligibility and project design still matter."
+  },
+  "SA_OZ1": {
+    "title": "Santa Ana \u00b7 Metro East Mixed Use Overlay",
+    "url": "https://ceqanet.lci.ca.gov/2006031041/4",
+    "check": "Check the city\u2019s adopted Metro East use and development standards and the parcel\u2019s exact overlay subarea. This state record documents the overlay\u2019s purpose and is not project approval."
+  },
+  "SA_SD84": {
+    "title": "Santa Ana \u00b7 Transit Zoning Code (SD84)",
+    "url": "https://storage.googleapis.com/proudcity/santaanaca/2026/03/eb8f3661-compressed-for-website-complete-tzc-booklet-toc-all-divisions-4.1.26.pdf",
+    "check": "Determine the regulating-plan sub-zone, building type, street frontage and use-permit requirements. SD84 also identifies a local adaptive-reuse incentive area."
+  },
+  "SA_CODE": {
+    "title": "Santa Ana Municipal Code \u00b7 Chapter 41",
+    "url": "https://library.municode.com/ca/santa_ana/codes/code_of_ordinances?nodeId=PTIITHCO_CH41ZO",
+    "check": "Read the current permitted uses and overlays for the mapped district; confirm the source parcel identity and any development agreement."
+  },
+  "CC01_CEQA": {
+    "title": "1200 N Main \u00b7 City-filed project-specific CEQA notice",
+    "url": "https://ceqanet.lci.ca.gov/2026010918",
+    "check": "The notice describes DP-2025-9-CHG and 184 proposed units. Match the project plans and addresses; the filing is not a building permit, a financing commitment, or evidence of eligibility for another site. The notice and listing report different building areas."
+  },
+  "ANA_COMMERCIAL": {
+    "title": "Anaheim \u00b7 Table 8-A, \u00a718.08.030",
+    "url": "https://codelibrary.amlegal.com/codes/anaheim/latest/anaheim_ca/0-0-0-103023",
+    "check": "For C-G and O-L, the multifamily dwelling row is marked permitted with special provisions. Check the General Plan designation and implementing zone under \u00a718.08.030.150 where applicable; conversions of motels, commercial and office structures can engage \u00a718.38.215."
+  },
+  "ORANGE_CODE": {
+    "title": "Orange \u00b7 Title 17 zoning regulations",
+    "url": "https://www.cityoforange.org/our-city/departments/community-development/planning-division/zoning",
+    "check": "Check the C-2 use table, parcel overlays and current density standards. A commercial listing or neighbourhood name does not establish multifamily permission."
+  },
+  "TUSTIN_CODE": {
+    "title": "Tustin \u00b7 Municipal Code",
+    "url": "https://library.municode.com/ca/tustin/codes/code_of_ordinances",
+    "check": "Check Article 9, Chapter 2 and any governing planned-community plan. PC COM identifies planned commercial use; confirm the site\u2019s adopted use list."
+  },
+  "TUSTIN_PR": {
+    "title": "Tustin \u00b7 \u00a79231 Professional District (Pr)",
+    "url": "https://www.tustinca.org/DocumentCenter/View/4937/Massage-Establishment-Permit-Startup-Checklist",
+    "check": "Section 9231 lists professional offices and single-family dwellings subject to R1 conditions. Confirm the parcel designation and adopted amendments. The Pr label does not establish that a multifamily conversion is permitted."
+  },
+  "WESTMINSTER_CODE": {
+    "title": "Westminster \u00b7 Zoning Code",
+    "url": "https://www.westminster-ca.gov/departments/community-development/planning-division/zoning-code",
+    "check": "Read the applicable commercial-district use table and specific-plan or overlay provisions. Verify housing use and approval type independently."
+  },
+  "GG_GGMU1": {
+    "title": "Garden Grove \u00b7 Mixed-use district use matrix",
+    "url": "https://ecode360.com/42532169",
+    "check": "Read Table 9.18-1 for the GGMU-1 column and related operating conditions. Verify the motel\u2019s operating history, proposed housing type and entitlement route separately."
+  },
+  "SA_C1": {
+    "title": "Santa Ana \u00b7 Community Commercial (C1)",
+    "check": "Start with \u00a741-365\u2019s permitted uses and the conditional-use provisions in the city handout. Verify the proposed residential use or a separate housing pathway.",
+    "url": "https://storage.googleapis.com/proudcity/santaanaca/uploads/2023/07/Community-Commercial-C1-Handout-7.25.23.pdf"
+  },
+  "SA_C2": {
+    "title": "Santa Ana \u00b7 General Commercial (C2)",
+    "check": "The C2 use list incorporates permitted C1 uses and includes additional commercial uses. Check the C2 provisions and any site overlay before treating residential conversion as allowed.",
+    "url": "https://storage.googleapis.com/proudcity/santaanaca/uploads/2022/03/General-Commercial-C2-Handout-7.28.2023.pdf"
+  },
+  "ORANGE_C2": {
+    "title": "Orange \u00b7 Commercial districts, Chapter 17.18",
+    "check": "Check the C2 use table, dimensional standards and any site-specific overlays. Confirm the housing approval route with the city.",
+    "url": "https://ecode360.com/43568487"
+  },
+  "WESTMINSTER_C1": {
+    "title": "Westminster \u00b7 Commercial districts, Chapter 17.220",
+    "check": "Check the C1 column of the commercial use table and the applicable development standards. Verify the proposal\u2019s use and permit requirements.",
+    "url": "https://ecode360.com/43534722"
+  }
+}

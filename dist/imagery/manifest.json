@@ -1,0 +1,158 @@
+{
+  "source": "https://basemap.nationalmap.gov/arcgis/rest/services/USGSImageryOnly/MapServer",
+  "credit": "USDA, USGS The National Map: Orthoimagery. Data refreshed June, 2024.v1.2. Offshore backdrop: NASA Blue Marble via GIBS.",
+  "offshoreSource": "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/BlueMarble_ShadedRelief_Bathymetry/default/GoogleMapsCompatible_Level8",
+  "shorelineSource": "U.S. Census Bureau 2010 cartographic boundaries via https://eric.clst.org/tech/usgeojson/",
+  "crs": "EPSG:3857",
+  "boundsCrs": "EPSG:4326",
+  "geographicFileCrs": "EPSG:4326",
+  "images": [
+    {
+      "id": "county",
+      "file": "county.jpg",
+      "geographicFile": "county-geographic.jpg",
+      "bounds": [
+        -118.4765625,
+        33.137551192346145,
+        -117.0703125,
+        34.016241889667015
+      ],
+      "mercatorBounds": [
+        -13188750.608437452,
+        3913575.8482010234,
+        -13032207.57450941,
+        4030983.1236470547
+      ],
+      "zoom": 11,
+      "width": 2048,
+      "height": 1536,
+      "sha256": "9cab8d854dee10ba344db98ab7457becc275103b6c6fb372b2e93a1a1ed3549d"
+    },
+    {
+      "id": "ANA",
+      "file": "ana.jpg",
+      "geographicFile": "ana-geographic.jpg",
+      "bounds": [
+        -117.94921875,
+        33.797408767572485,
+        -117.861328125,
+        33.87041555094183
+      ],
+      "mercatorBounds": [
+        -13130046.970714435,
+        4001631.304785548,
+        -13120263.031093933,
+        4011415.24440605
+      ],
+      "zoom": 14,
+      "width": 1024,
+      "height": 1024,
+      "sha256": "eb32922027f93a035be3304218b98f8a815d9d06248fb97e02916b39fdf1ed08"
+    },
+    {
+      "id": "SA",
+      "file": "sa.jpg",
+      "geographicFile": "sa-geographic.jpg",
+      "bounds": [
+        -117.92724609375,
+        33.706062655101206,
+        -117.83935546875,
+        33.779147331286474
+      ],
+      "mercatorBounds": [
+        -13127600.985809311,
+        3989401.38025992,
+        -13117817.046188809,
+        3999185.319880422
+      ],
+      "zoom": 14,
+      "width": 1024,
+      "height": 1024,
+      "sha256": "2573d88cd8c7d3474e81a3bcf537a5dd4ec1314e0027b9b860ea7c45cbc863f3"
+    },
+    {
+      "id": "CM",
+      "file": "cm.jpg",
+      "geographicFile": "cm-geographic.jpg",
+      "bounds": [
+        -117.94921875,
+        33.63291573870477,
+        -117.861328125,
+        33.706062655101206
+      ],
+      "mercatorBounds": [
+        -13130046.970714435,
+        3979617.4406394158,
+        -13120263.031093933,
+        3989401.38025992
+      ],
+      "zoom": 14,
+      "width": 1024,
+      "height": 1024,
+      "sha256": "4866f7e7528e273b4edab5ba0b057771e70472b6b4904e01b712a202d464ec0c"
+    },
+    {
+      "id": "GG",
+      "file": "gg.jpg",
+      "geographicFile": "gg-geographic.jpg",
+      "bounds": [
+        -117.9931640625,
+        33.74261277734688,
+        -117.9052734375,
+        33.815666308702774
+      ],
+      "mercatorBounds": [
+        -13134938.940524686,
+        3994293.350070171,
+        -13125155.000904184,
+        4004077.2896906734
+      ],
+      "zoom": 14,
+      "width": 1024,
+      "height": 1024,
+      "sha256": "aea4ca445eec80b33f073014811febae6ccf1f1b1c31e0423c830203e98802b9"
+    },
+    {
+      "id": "IRV",
+      "file": "irv.jpg",
+      "geographicFile": "irv-geographic.jpg",
+      "bounds": [
+        -117.83935546875,
+        33.65120829920498,
+        -117.75146484375,
+        33.7243396617476
+      ],
+      "mercatorBounds": [
+        -13117817.046188809,
+        3982063.4255445413,
+        -13108033.106568307,
+        3991847.3651650455
+      ],
+      "zoom": 14,
+      "width": 1024,
+      "height": 1024,
+      "sha256": "8fca1e71bf885dffa302587958c438eb17d7a27dcf7ffaa67a975d509866a88f"
+    },
+    {
+      "id": "LF",
+      "file": "lf.jpg",
+      "geographicFile": "lf-geographic.jpg",
+      "bounds": [
+        -117.7294921875,
+        33.61461929233378,
+        -117.6416015625,
+        33.68778175843937
+      ],
+      "mercatorBounds": [
+        -13105587.12166318,
+        3977171.45573429,
+        -13095803.182042677,
+        3986955.3953547925
+      ],
+      "zoom": 14,
+      "width": 1024,
+      "height": 1024,
+      "sha256": "7c2e75bbd0d25ecb1cf623c74e9a30fc72978185672ce2eae523b68e502f86c8"
+    }
+  ]
+}

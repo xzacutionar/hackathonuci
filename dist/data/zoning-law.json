@@ -1,0 +1,253 @@
+{
+  "cities": {
+    "IRV": {
+      "title": "Irvine Zoning Ordinance, Division 3",
+      "url": "https://library.municode.com/CA/Irvine/codes/zoning?nodeId=ZOOR_DIV3GEDESTLAUSRE",
+      "rules": [
+        {
+          "codes": [
+            "2.4",
+            "2.5"
+          ],
+          "benefit": "Sections 3-37-15 and 3-37-16 identify medium-high and high-density residential districts. Compare a multifamily scheme with the applicable district’s use table.",
+          "caution": "Check the planning-area chapter and whether master-plan review applies before estimating unit yield.",
+          "url": "https://library.municode.com/CA/Irvine/codes/zoning?nodeId=ZOOR_DIV3GEDESTLAUSRE"
+        },
+        {
+          "codes": [
+            "3.1",
+            "3.1A",
+            "3.2"
+          ],
+          "benefit": "A multi-use or transit-oriented designation gives a reason to investigate housing alongside other uses.",
+          "caution": "Read the precise district and planning-area use tables. The label alone does not establish that a particular housing project is permitted.",
+          "url": "https://library.municode.com/CA/Irvine/codes/zoning?nodeId=ZOOR_DIV3GEDESTLAUSRE"
+        }
+      ]
+    },
+    "SA": {
+      "title": "Santa Ana Municipal Code, Chapter 41",
+      "url": "https://library.municode.com/ca/santa_ana/codes/code_of_ordinances?nodeId=PTIITHCO_CH41ZO",
+      "rules": [
+        {
+          "codes": [
+            "R3",
+            "R-3"
+          ],
+          "benefit": "Section 41-259 lists multifamily dwellings as a permitted use, making an apartment proposal worth testing against the R3 standards.",
+          "caution": "Townhouses follow different design standards. Verify lot size, setbacks and project form under the applicable division.",
+          "url": "https://storage.googleapis.com/proudcity/santaanaca/2022/03/4b59c872-r3.pdf"
+        },
+        {
+          "codes": [
+            "R2",
+            "R-2"
+          ],
+          "benefit": "Section 41-247 lists two-family homes and townhouses among permitted uses. This supports screening a smaller affordable development.",
+          "caution": "Townhouses have separate design standards under Division 6. Larger apartment schemes require an independently supported route.",
+          "url": "https://storage.googleapis.com/proudcity/santaanaca/2026/03/dce5c11c-r2-two-family.pdf"
+        },
+        {
+          "codes": [
+            "R1",
+            "R-1"
+          ],
+          "benefit": "A detached affordable home is consistent with the district’s single-family residential purpose.",
+          "caution": "For a larger apartment proposal, establish an alternative planning or state-law route before estimating capacity. Check the current §41-232 use list and any overlay.",
+          "url": "https://library.municode.com/ca/santa_ana/codes/code_of_ordinances?nodeId=PTIITHCO_CH41ZO"
+        },
+        {
+          "codes": [
+            "R4",
+            "R-4"
+          ],
+          "benefit": "The city maps this as a suburban apartment district, so an apartment layout is worth testing against district standards.",
+          "caution": "Confirm the permitted use, minimum lot size and density for the specific site; the map alone supplies none of those quantities.",
+          "url": "https://storage.googleapis.com/proudcity/santaanaca/2025/09/7c0cb300-zoning-full-city-2025-12-12-25.pdf"
+        },
+        {
+          "codes": [
+            "SD84",
+            "SD-84"
+          ],
+          "benefit": "Article XIX provides a transit zoning code with sub-zones and use tables for site-specific housing research.",
+          "caution": "Identify the sub-zone and overlays before assigning allowed uses, building type or approval process. SD84 alone is too broad.",
+          "url": "https://library.municode.com/ca/santa_ana/codes/code_of_ordinances?nodeId=PTIITHCO_CH41ZO"
+        }
+      ]
+    },
+    "ANA": {
+      "title": "Anaheim Municipal Code, Title 18",
+      "url": "https://codelibrary.amlegal.com/codes/anaheim/latest/anaheim_ca/0-0-0-102594",
+      "rules": [
+        {
+          "codes": [
+            "RM-2",
+            "RM-3",
+            "RM-3.5",
+            "RM-4"
+          ],
+          "benefit": "Table 6-A designates multifamily dwellings as a permitted use in these districts.",
+          "caution": "Check the special provisions in §§18.38.100 and 18.40.090 and project development standards before calculating capacity.",
+          "url": "https://codelibrary.amlegal.com/codes/anaheim/latest/anaheim_ca/0-0-0-102855"
+        },
+        {
+          "codes": [
+            "RM-1"
+          ],
+          "benefit": "Table 6-A identifies a route without a conditional-use permit for qualifying affordable developments on eligible sites.",
+          "caution": "Outside that exception, multifamily dwellings require a conditional-use permit under the local table. Verify eligibility under §18.38.023.",
+          "url": "https://codelibrary.amlegal.com/codes/anaheim/latest/anaheim_ca/0-0-0-102855"
+        },
+        {
+          "codes": [
+            "C-NC",
+            "C-R",
+            "O-H"
+          ],
+          "benefit": "Table 8-A identifies an affordable-development exception for multifamily housing on eligible sites.",
+          "caution": "The multifamily row is otherwise prohibited under the local table. Verify §18.38.023 eligibility and applicable overlays.",
+          "url": "https://codelibrary.amlegal.com/codes/anaheim/latest/anaheim_ca/0-0-0-103023"
+        },
+        {
+          "codes": [
+            "C-G",
+            "O-L"
+          ],
+          "benefit": "Table 8-A marks multifamily dwellings as a permitted use, subject to its special provisions.",
+          "caution": "Check the General Plan designation and implementing zone under §18.08.030.150 where applicable. Motel or office conversions carry separate conditions.",
+          "url": "https://codelibrary.amlegal.com/codes/anaheim/latest/anaheim_ca/0-0-0-103023"
+        }
+      ]
+    },
+    "CM": {
+      "title": "Costa Mesa Municipal Code, Title 13",
+      "url": "https://ecode360.com/42616379",
+      "rules": [
+        {
+          "codes": [
+            "R3",
+            "R-3"
+          ],
+          "benefit": "Table 13-32 gives an R3 base density of one dwelling per 2,178 square feet of gross land area.",
+          "caution": "The table also specifies minimum lot area and open space. Common-interest developments have separate standards.",
+          "url": "https://ecode360.com/48952361"
+        },
+        {
+          "codes": [
+            "R2-HD"
+          ],
+          "benefit": "Table 13-32 provides a base density of one dwelling per 3,000 square feet of gross land area.",
+          "caution": "Check lot area, open space, and the provisions applicable to the development’s ownership form.",
+          "url": "https://ecode360.com/48952361"
+        },
+        {
+          "codes": [
+            "R2-MD"
+          ],
+          "benefit": "Table 13-32 gives a base density of one dwelling per 3,630 square feet, with a specific exception for certain older lots.",
+          "caution": "The older-lot exception depends on creation date and lot area. Confirm both before relying on the exception.",
+          "url": "https://ecode360.com/48952361"
+        }
+      ]
+    },
+    "GG": {
+      "title": "Garden Grove Municipal Code, Title 9",
+      "url": "https://ecode360.com/42528178",
+      "rules": [
+        {
+          "codes": [
+            "R-2",
+            "R2"
+          ],
+          "benefit": "The base R-2 multifamily standards list a maximum of 21 units per acre. Qualifying projects can investigate a state density bonus.",
+          "caution": "The permissible footprint can shrink beside R-1 property because upper floors face additional stepbacks.",
+          "url": "https://ecode360.com/42530130"
+        },
+        {
+          "codes": [
+            "R-3",
+            "R3"
+          ],
+          "benefit": "The base R-3 multifamily standards list a maximum of 32 units per acre. Qualifying projects can investigate a state density bonus.",
+          "caution": "The base table limits height to 35 feet and three stories, with additional stepbacks beside R-1 property. Check exceptions and waivers.",
+          "url": "https://ecode360.com/42530130"
+        }
+      ]
+    },
+    "LF": {
+      "title": "Lake Forest Municipal Code, Planning and Zoning",
+      "url": "https://ecode360.com/LA4954",
+      "rules": [
+        {
+          "codes": [
+            "R2",
+            "R-2"
+          ],
+          "benefit": "Chapter 9.56 lists multifamily dwellings of four units or fewer among principal permitted uses.",
+          "caution": "Five or more units generally require a site-development permit under §9.56.030. Specified common-interest projects follow separate provisions.",
+          "url": "https://ecode360.com/43971765"
+        },
+        {
+          "codes": [
+            "R1",
+            "R-1"
+          ],
+          "benefit": "The R1 district provides a starting point for evaluating a detached-home layout.",
+          "caution": "A conventional apartment project needs a separately supported pathway. Check whether state law or another site-specific provision changes the local baseline.",
+          "url": "https://ecode360.com/51613631"
+        },
+        {
+          "codes": [
+            "MU32",
+            "MU 32",
+            "MU-32"
+          ],
+          "benefit": "Section 9.73.020 allows an entirely residential project and sets a base maximum of 32 units per net acre.",
+          "caution": "Check net developable area, open-space requirements and any specific-plan requirement at Foothill Ranch Town Center.",
+          "url": "https://ecode360.com/43971999"
+        },
+        {
+          "codes": [
+            "MU43",
+            "MU 43",
+            "MU-43"
+          ],
+          "benefit": "Section 9.73.030 allows entirely residential projects as well as mixed-use projects.",
+          "caution": "Check the district’s residential density and open-space standards; a scheme that also includes businesses must meet the nonresidential floor-area requirements.",
+          "url": "https://ecode360.com/43971999"
+        },
+        {
+          "codes": [
+            "UI25",
+            "UI 25",
+            "UI-25"
+          ],
+          "benefit": "Chapter 9.73 expressly includes residential uses and all-residential projects in Urban Industrial 25.",
+          "caution": "Screen surrounding industrial uses for compatibility and check the district’s residential development standards.",
+          "url": "https://ecode360.com/43971999"
+        }
+      ]
+    }
+  },
+  "pathways": [
+    {
+      "title": "State Density Bonus Law · Government Code §65915",
+      "benefit": "Qualifying housing developments can obtain added density and, where statutory criteria are met, concessions, waivers or reduced parking.",
+      "caution": "Check project size, unit mix, income levels and affordability commitments. A mapped district does not establish eligibility or the size of a bonus.",
+      "url": "https://www.hcd.ca.gov/sites/default/files/docs/planning-and-community/density-bonus-law.pdf"
+    },
+    {
+      "title": "AB 2011 · Government Code §§65912.100–65912.140",
+      "benefit": "Screen qualifying commercially zoned sites for the 100% affordable route, or eligible commercial corridors for the mixed-income route. Eligible projects receive ministerial review.",
+      "caution": "Check allowed commercial uses, site and corridor criteria, affordability, labour requirements and exclusions for the chosen route.",
+      "url": "https://www.hcd.ca.gov/hau/enforcement-authority"
+    },
+    {
+      "title": "SB 4 · Government Code §65913.16",
+      "benefit": "Certain 100% affordable projects on land owned by religious or higher education institutions may qualify for ministerial approval.",
+      "caution": "Verify qualifying ownership before 1 January 2024 and the affordability, location, wage and demolition conditions. Institutional zoning alone is insufficient.",
+      "url": "https://www.hcd.ca.gov/hau/enforcement-authority"
+    }
+  ]
+}

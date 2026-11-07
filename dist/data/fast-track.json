@@ -1,0 +1,112 @@
+{
+  "checked": "2026-11-07",
+  "priority": "Prioritise the most complete evidence for a specific pathway. Green requires verified supporting facts for that screen. Red requires a documented disqualifier for that pathway. Amber covers missing, conflicting or unverified facts. Unknown parcel boundaries, tenancy, hazards, site control or project terms must never generate a green site rating.",
+  "criteria": [
+    {
+      "title": "Approval route and clock",
+      "ideal": "Identify the ministerial statute, complete application date and responsible approving agency.",
+      "reason": "Ministerial review generally avoids discretionary CEQA review. A CEQA exemption alone does not create a ministerial entitlement. Statutory clocks can measure a consistency determination or design review rather than final permits.",
+      "url": "https://www.hcd.ca.gov/sites/default/files/docs/planning-and-community/smap-sb-35-sb-423.pdf"
+    },
+    {
+      "title": "Urban infill and site area",
+      "ideal": "Measure legal parcel area and the share of its perimeter adjoining qualifying urban uses from parcel geometry.",
+      "reason": "SB 35 generally tests 75% urban adjacency. AB 130 has alternative infill tests, including prior urban development or 75% perimeter adjacency. Its general cap is 20 acres, reduced to four acres for builder’s-remedy projects.",
+      "url": "https://abag.ca.gov/sites/default/files/documents/2026-04/AB-130-SB-131-2025-Summary-Updated-04212026.pdf"
+    },
+    {
+      "title": "Zoning and plan consistency",
+      "ideal": "Record the use table, overlays, specific plan, objective standards and proposed density.",
+      "reason": "SB 35 tests objective standards and residential or qualifying mixed-use zoning. AB 2011 can provide a separate route on eligible commercial land. An industrial designation or a district name alone cannot establish a housing use.",
+      "url": "https://www.hcd.ca.gov/sites/default/files/docs/planning-and-community/smap-sb-35-sb-423.pdf"
+    },
+    {
+      "title": "Hazards and sensitive lands",
+      "ideal": "Check fire severity, floods and floodways, earthquake faults, wetlands, prime farmland, protected habitat and hazardous-waste records.",
+      "reason": "Check each statute’s exclusions and mitigation exceptions. A flood, fault or cleanup flag needs the applicable assessment, clearance or mitigation evidence before a conclusion about that route.",
+      "url": "https://abag.ca.gov/sites/default/files/documents/2026-04/AB-130-SB-131-2025-Summary-Updated-04212026.pdf"
+    },
+    {
+      "title": "Historic status and tribal review",
+      "ideal": "Search national, state and local registers and document proposed demolition and tribal consultation.",
+      "reason": "AB 130 excludes demolition of a qualifying listed historic structure and requires tribal procedures. SB 35 has its own historic and tribal resource screens.",
+      "url": "https://abag.ca.gov/sites/default/files/documents/2026-04/AB-130-SB-131-2025-Summary-Updated-04212026.pdf"
+    },
+    {
+      "title": "Tenants and displacement",
+      "ideal": "Obtain occupancy, demolition, rent control, recorded affordability and Ellis Act withdrawal records.",
+      "reason": "SB 9 protects tenant-occupied housing within a three-year lookback and screens Ellis Act withdrawals in the past 15 years. The starter-home route has a five-year tenant lookback. SB 35 screens demolition of housing occupied by tenants within ten years and prior demolition of such housing on the site.",
+      "url": "https://www.hcd.ca.gov/sites/default/files/docs/planning-and-community/sb-9-fact-sheet.pdf"
+    },
+    {
+      "title": "Transit evidence",
+      "ideal": "Measure to a legally qualifying major transit stop, then verify actual service, tier and any approved local alternative.",
+      "reason": "AB 2097 uses a half-mile major-stop test. SB 79 has separate county, stop and distance requirements. SCAG’s 29 October 2026 update identifies Los Angeles as its only qualifying county; Orange County is contingent on OC Streetcar revenue service.",
+      "url": "https://scag.ca.gov/sb79",
+      "extraUrl": "https://octa.net/programs-projects/projects/rail-projects/oc-streetcar/overview/"
+    },
+    {
+      "title": "Project size and tenure",
+      "ideal": "Record unit count, split count, acreage, ownership form and project sponsor.",
+      "reason": "SB 9 addresses two-unit development or an eligible two-lot split. SB 684/1123 addresses up to ten lots and ten units on qualifying sites. Qualifying faith or higher-education ownership is a separate SB 4 test.",
+      "url": "https://www.hcd.ca.gov/sites/default/files/docs/planning-and-community/starter-home-revitalization-act.pdf"
+    },
+    {
+      "title": "City determination and affordability",
+      "ideal": "Check the city’s current HCD SMAP determination and document rental or ownership income restrictions.",
+      "reason": "The 10% and 50% SB 35 pathways depend on the jurisdiction determination and project details. The 10% pathway for more than ten units generally requires very-low-income rentals or lower-income ownership units. Check stricter local requirements.",
+      "url": "https://www.hcd.ca.gov/planning-and-community-development/streamlined-ministerial-approval-process-dashboard"
+    },
+    {
+      "title": "Labour and delivery",
+      "ideal": "Budget wages, benefits, apprenticeships and compliance documentation for the selected pathway.",
+      "reason": "SB 35 generally requires prevailing wages above ten units, with additional requirements from 50 units and above 85 feet, subject to exceptions. AB 2011 and SB 4 use separate labour rules.",
+      "url": "https://www.hcd.ca.gov/sites/default/files/docs/planning-and-community/smap-sb-35-sb-423.pdf"
+    }
+  ],
+  "pathways": [
+    {
+      "title": "SB 9 · Two homes and urban lot splits",
+      "body": "Government Code §§65852.21 and 66411.7. Screen an eligible urban single-family parcel for two primary homes, a two-lot split, or both. Check lot proportions, historic and sensitive sites, tenant history and owner-occupancy rules for a split. Under SB 450, decide within 60 days of a completed application; statutory inaction can result in deemed approval.",
+      "url": "https://www.hcd.ca.gov/sites/default/files/docs/planning-and-community/sb-9-fact-sheet.pdf"
+    },
+    {
+      "title": "SB 684 / SB 1123 · Starter homes",
+      "body": "Government Code §§65852.28 and 66499.41. Up to ten lots and ten total units on a qualifying urban infill parcel: multifamily land up to five acres, or qualifying vacant single-family land up to 1.5 acres under the expansion operative 1 July 2025. Check parcel creation, ownership form, density and tenant protections. The 60-day ministerial decision clock requires a complete qualifying application.",
+      "url": "https://www.hcd.ca.gov/sites/default/files/docs/planning-and-community/starter-home-revitalization-act.pdf"
+    },
+    {
+      "title": "SB 35 / SB 423 · Streamlined multifamily approval",
+      "body": "Government Code §65913.4. Verify the HCD city determination, infill, objective standards, affordability, tenant protections, labour and pre-application tribal process. For up to 150 units, the consistency determination is due within 60 days and design review within 90; above 150 units those limits are 90 and 180 days. These are different review milestones, not a construction timetable.",
+      "url": "https://www.hcd.ca.gov/sites/default/files/docs/planning-and-community/smap-sb-35-sb-423.pdf",
+      "extraUrl": "https://www.hcd.ca.gov/planning-and-community-development/streamlined-ministerial-approval-process-dashboard"
+    },
+    {
+      "title": "SB 4 · Faith and higher-education land",
+      "body": "Government Code §65913.16. Screen land owned before 1 January 2024 by a qualifying religious organisation or independent higher-education institution. Verify affordable unit mix, eligible developer, land-use exclusions and labour. The 60-/90-day written consistency determination depends on whether the proposal has up to 150 or more than 150 units. Except managers’ units, verify lower-income restrictions, the allowances for moderate-income households (up to 20%) and institutional staff (up to 5%), and 55-year rental or 45-year ownership covenants.",
+      "url": "https://www.hcd.ca.gov/sites/default/files/docs/planning-and-community/aff-hsg-faith-higher-ed-sb-4.pdf"
+    },
+    {
+      "title": "AB 2011 · Affordable housing on commercial sites",
+      "body": "Government Code §§65912.100–65912.140. Two routes cover eligible fully affordable projects on commercial land and eligible mixed-income projects along commercial corridors. Verify permitted office, retail or parking use, site exclusions, affordability commitments and applicable labour standards. Consistency review generally uses 60 days for up to 150 units or 90 days above 150. For instance, a mixed-income ownership route uses 30% moderate-income or 15% lower-income homes; check all alternatives and any stricter local requirement.",
+      "url": "https://www.hcd.ca.gov/hau/enforcement-authority",
+      "extraUrl": "https://abag.ca.gov/sites/default/files/documents/2025-04/AB-2011-SB-6-Summary-Key-Details-4-2025.pdf"
+    },
+    {
+      "title": "AB 130 · Urban infill CEQA exemption",
+      "body": "Public Resources Code §21080.66, as amended. Verify urban infill, size, density, zoning or planning consistency, historic and hazard screens and tribal procedures. SB 158 sets a 30-day approve-or-deny clock after the later applicable consultation or Housing Accountability Act consistency milestone. This is an environmental exemption; underlying land-use approvals remain relevant.",
+      "url": "https://abag.ca.gov/sites/default/files/documents/2026-04/AB-130-SB-131-2025-Summary-Updated-04212026.pdf"
+    },
+    {
+      "title": "SB 79 · Transit-oriented development",
+      "body": "State standards took effect 1 July 2026, subject to county and station coverage and authorised local alternatives. SCAG’s 29 October 2026 map does not establish current coverage in Orange County. Recheck upon OC Streetcar revenue service; even then only qualifying stations, tiers and distances apply. Treat this as a future monitor for OC, not an active shortcut.",
+      "url": "https://scag.ca.gov/sb79",
+      "extraUrl": "https://octa.net/programs-projects/projects/rail-projects/oc-streetcar/overview/"
+    },
+    {
+      "title": "AB 2097 · Minimum parking relief",
+      "body": "Government Code §65863.2 generally prevents a local minimum automobile parking requirement within half a mile of a major transit stop. Verify the statutory stop definition, exceptions and any timely supported local findings. Parking relief can improve site layout; it does not itself authorise housing or give a permit-decision deadline.",
+      "url": "https://www.hcd.ca.gov/hau/enforcement-authority"
+    }
+  ]
+}
