@@ -42,18 +42,45 @@ export function zoningInspector(map,onPoint){
    if(highlight)highlight.setStyle({weight:1,color:'#63576a'});
    focus=feature;highlight=path;path.setStyle({weight:3,color:'#362048'});path.bringToFront();render();onPoint(latlng||path.getBounds().getCenter());
  }
- // Select the smallest mapped section at the clicked position, even where a municipal outline overlaps it.
- map.getContainer().addEventListener('click',event=>{
-   if(!city||!data||event.target.closest('.leaflet-marker-icon,.leaflet-popup,.leaflet-control')||map.dragging?.moved())return;
-   const ll=map.mouseEventToLatLng(event),point=[ll.lng,ll.lat];let picked=null,size=Infinity;
+ // Hover and click resolve overlaps to the same smallest district.
+ function districtAt(ll){
+   const point=[ll.lng,ll.lat];let picked=null,size=Infinity;
    for(const group of layer.getLayers())group.eachLayer(path=>{
-     const bounds=path.getBounds();if(!bounds.contains(ll)||!contains(path.feature.geometry,point))return;
+     const bounds=path.getBounds();if(!bounds.contains(ll))return;
      const area=(bounds.getEast()-bounds.getWest())*(bounds.getNorth()-bounds.getSouth());
-     if(area<size){size=area;picked=path;}
+     if(area<size&&contains(path.feature.geometry,point)){size=area;picked=path;}
    });
-   if(picked){event.stopPropagation();selectFeature(picked.feature,picked,ll);}
+   return picked;
+ }
+ const container=map.getContainer(),tooltip=L.tooltip({direction:'auto',offset:[12,0]});
+ let hovered=null;
+ function clearHover(){
+   hovered=null;tooltip.remove();
+ }
+ function overControl(event){
+   return event.target.closest('.leaflet-marker-icon,.leaflet-popup,.leaflet-control');
+ }
+ container.addEventListener('mousemove',event=>{
+   if(!data||event.buttons||overControl(event)){clearHover();return;}
+   const ll=map.mouseEventToLatLng(event),path=districtAt(ll);
+   if(!path){clearHover();return;}
+   if(path!==hovered){
+     hovered=path;
+     const {name,code}=path.feature.properties,category=family(name);
+     tooltip.setContent('<b><span aria-hidden="true" style="display:inline-block;width:.8em;height:.8em;border:1px solid #777;border-radius:2px;margin-right:.4em;background:'+colors[category]+'"></span>'+escape(category)+'</b><br>'+escape([code,name].filter(Boolean).join(' · ')));
+   }
+   const cityTip=document.getElementById('tip');if(cityTip)cityTip.hidden=true;
+   tooltip.setLatLng(ll);if(!map.hasLayer(tooltip))tooltip.addTo(map);
+ });
+ container.addEventListener('mouseleave',clearHover);
+ map.on('movestart',clearHover);
+ container.addEventListener('click',event=>{
+   if(!data||overControl(event)||map.dragging?.moved())return;
+   const ll=map.mouseEventToLatLng(event),picked=districtAt(ll);
+   if(picked){event.stopPropagation();clearHover();selectFeature(picked.feature,picked,ll);}
  },true);
  function selectCity(s){
+   clearHover();
    const id=++sequence;city=s?.kind==='region'?s:null;focus=null;highlight=null;data=null;failed=false;layer.clearLayers();render();
    if(!city)return;
    const key=city.id;
@@ -61,7 +88,6 @@ export function zoningInspector(map,onPoint){
    cache.get(key).then(fc=>{
      if(id!==sequence)return;data=fc;
      L.geoJSON(fc,{renderer,pane:'zoning',style:f=>({color:'#63576a',weight:1,fillOpacity:.5,fillColor:colors[family(f.properties.name)]}),onEachFeature:(f,path)=>{
-       const p=f.properties;path.bindTooltip(escape(p.code)+' · '+escape(p.name),{sticky:true});
        path.on('click',e=>{L.DomEvent.stopPropagation(e.originalEvent);selectFeature(f,path,e.latlng);});
      }}).addTo(layer);render();
    }).catch(()=>{cache.delete(key);if(id===sequence){failed=true;render();}});
@@ -73,7 +99,7 @@ export function zoningInspector(map,onPoint){
    const base='<h2>Zoning districts</h2>';
    const sources='<div class="zlinks">'+link(data?.source,'Zoning map source')+link(data?.ordinance||laws.url,'City zoning ordinance')+link(url(tabs['Legal Pathways']||1587836229),'Legal Pathways sheet')+'</div>';
    const vintage=city.id==='CM'?'Historical zoning: SCAG’s map book uses Costa Mesa local zoning dated 27 September 2017. Confirm the current classification with the city before relying on it.':(data?.vintage||'');
-   let body=failed?'<p>District geometry is unavailable for this city.</p>':!data?'<p>Loading city zoning…</p>':'<p>Click a coloured section on the 2D map to inspect its zoning and housing considerations.</p>';
+   let body=failed?'<p>District geometry is unavailable for this city.</p>':!data?'<p>Loading city zoning…</p>':'<p>Hover over a coloured zone to see its category. Select it to inspect the district.</p>';
    if(data){
      const entries=new Map();for(const f of data.features)entries.set(f.properties.code,f.properties.name);
      body+='<label>Inspect a district<select id="zone-picker"><option value="">Select zoning code</option>'+[...entries].sort((a,b)=>String(a[0]).localeCompare(String(b[0]),undefined,{numeric:true})).map(([c,n])=>'<option value="'+escape(c)+'" '+(focus&&String(focus.properties.code)===String(c)?'selected':'')+'>'+escape(c)+' · '+escape(n)+'</option>').join('')+'</select></label>';
