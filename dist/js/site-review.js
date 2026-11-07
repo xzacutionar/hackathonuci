@@ -26,10 +26,10 @@ export async function guide(){
  body.innerHTML='<p class="lead">Screen each legal pathway separately. A parcel can satisfy a mapped criterion while ownership, tenant history or project design still requires evidence.</p><h3>Site criteria</h3><div class="guide-table"><table><thead><tr><th>Criterion</th><th>What to look for</th><th>Why it matters</th></tr></thead><tbody>'+data.criteria.map(c=>'<tr><td>'+e(c.title)+'</td><td>'+e(c.ideal)+'</td><td>'+e(c.reason)+' '+link(c.url,'Source')+'</td></tr>').join('')+'</tbody></table></div><h3>Approval pathways</h3>'+data.pathways.map(p=>'<details class="law-card"><summary>'+e(p.title)+'</summary><p>'+e(p.body)+' '+link(p.url,'Official source')+'</p></details>').join('')+'<h3>How to prioritise a site</h3><p>'+e(data.priority)+'</p><p>For this prototype, hazard, historic, tenant and ownership screens remain unassessed unless a checked, parcel-specific record supplies evidence. A missing map layer cannot clear a site.</p><h3>Parcel inventory</h3><p>On 7 November 2026, the Parcel Geometries sheet contained 31,002 distinct parcel IDs in rows 2–31,003. This check covered identifiers only. The Site’s workbook matching index remains a sample; geometry accuracy and source completeness require separate checks. '+link('https://docs.google.com/spreadsheets/d/17NlGpn94b18pJvoRaVuTfZPA_nZlxd4IETw1rf1kFxY/edit#gid=1670023345','Parcel Geometries')+'</p>';
  }catch{body.textContent='The screening guide could not load. Reopen it to retry.';}
 }
-export function compareListings(rows){
+export function compareListings(rows,select){
  const body=start('Commercial acreage and zoning');
  body.innerHTML='<p>Workbook snapshot · 7 November 2026. Choose a property to inspect the source, photographs and conversion assumptions.</p><div class="guide-table"><table><thead><tr><th>Property</th><th>Parcel acres</th><th>Zoning code</th><th>Zoning description</th><th>Illustrative homes</th></tr></thead><tbody>'+rows.map((r,i)=>'<tr><td><button class="listing-link" data-row="'+i+'">'+e(r.property_name)+'</button></td>'+[r.parcel_acres,r.zoning_code,r.zoning_description,yieldLabel(r)].map(v=>'<td>'+e(v??'Not supplied')+'</td>').join('')+'</tr>').join('')+'</tbody></table></div>';
- body.querySelectorAll('[data-row]').forEach(b=>b.onclick=()=>inspectListing(rows[Number(b.dataset.row)]));
+ body.querySelectorAll('[data-row]').forEach(b=>b.onclick=()=>{dialog.close();select(rows[Number(b.dataset.row)]);});
 }
 export function inspectListing(r,startAt='laws'){
  const body=start(r.property_name),seq=version,sf=num(r.building_sf);
