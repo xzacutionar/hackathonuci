@@ -4,8 +4,28 @@ const sheet='https://docs.google.com/spreadsheets/d/17NlGpn94b18pJvoRaVuTfZPA_nZ
 const link=(href,label)=>/^https?:\/\//.test(href||'')?'<a target="_blank" rel="noopener" href="'+e(href)+'">'+e(label)+' ↗</a>':'';
 const num=v=>{const n=Number(String(v??'').replaceAll(',',''));return Number.isFinite(n)&&n>0?n:null;};
 function count(sf,share,area){return Math.floor(sf*share/area);}
+const housePiece = `<svg aria-hidden="true" focusable="false" width="56" height="50" viewBox="0 0 64 56">
+ <ellipse cx="32" cy="47" rx="26" ry="5" fill="#125337" opacity=".13"/>
+ <path fill="#097343" d="m7 28 14-16 14 10v24l-28-6z"/>
+ <path fill="#075736" d="m35 22 22-9v25l-22 8z"/>
+ <path fill="#17a863" d="m5 28 15-18 24-8-15 18z"/>
+ <path fill="#2cbb73" d="m20 10 24-8 15 13-24 9z"/>
+ <path fill="#07844d" d="m35 24 24-9v3l-24 9z"/>
+ <path fill="#159457" d="m30 8 5 2v8l-5-3z"/>
+ <path fill="#087044" d="m35 10 5-2v7l-5 3z"/>
+ <path fill="#56cb87" d="m30 8 5-2 5 2-5 2z"/>
+</svg>`;
+function upperEstimate(sf){return count(sf,.80,700);}
+function houseTier(sf){
+ if(!sf)return '';
+ const homes=upperEstimate(sf);
+ if(!homes)return '';
+ const pieces=homes<=20?1:homes<=40?2:3;
+ const band=['1–20','21–40','41+'][pieces-1];
+ return '<div style="display:flex;align-items:center;flex-wrap:wrap;gap:6px 14px;margin:8px 0"><span style="display:inline-flex">'+housePiece.repeat(pieces)+'</span><span><strong>'+band+' homes</strong><br><small>Based on the upper estimate</small></span></div>';
+}
 export function yieldLabel(r){
- const sf=num(r.building_sf);return sf?count(sf,.70,900)+'–'+count(sf,.80,700)+' illustrative homes':'Floor area unavailable';
+ const sf=num(r.building_sf);return sf?count(sf,.70,900)+'–'+upperEstimate(sf)+' illustrative homes':'Floor area unavailable';
 }
 let photos;
 export async function photoRecords(id){
@@ -33,7 +53,7 @@ export function compareListings(rows,select){
 }
 export function inspectListing(r,startAt='laws'){
  const body=start(r.property_name),seq=version,sf=num(r.building_sf);
- body.innerHTML='<p>'+e(r.address)+'</p><nav class="listing-sections"><button class="btn" data-jump="property-laws">District laws</button><button class="btn" data-jump="listing-gallery">Photos &amp; unit estimate</button></nav><section class="property-laws" data-property-laws></section><div class="listing-gallery"></div><div class="unit-est"><small>Existing-building conversion scenario</small><h3>'+e(yieldLabel(r))+'</h3><p>'+ (sf?'Using '+sf.toLocaleString()+' gross sq ft from the workbook. The low scenario assigns 70% to homes averaging 900 sq ft. The high scenario uses 80% and 700 sq ft. Both round down to whole homes.':'No usable gross floor area was supplied.')+'</p><p>These are floor-area scenarios. Windows, cores, access, infrastructure, local density limits and approvals can reduce yield or prevent conversion.</p></div>'+
+ body.innerHTML='<p>'+e(r.address)+'</p><nav class="listing-sections"><button class="btn" data-jump="property-laws">District laws</button><button class="btn" data-jump="listing-gallery">Photos &amp; unit estimate</button></nav><section class="property-laws" data-property-laws></section><div class="listing-gallery"></div><div class="unit-est"><small>Existing-building conversion scenario</small><h3>'+e(yieldLabel(r))+'</h3>'+houseTier(sf)+'<p>'+ (sf?'Using '+sf.toLocaleString()+' gross sq ft from the workbook. The low scenario assigns 70% to homes averaging 900 sq ft. The high scenario uses 80% and 700 sq ft. Both round down to whole homes.':'No usable gross floor area was supplied.')+'</p><p>These are floor-area scenarios. Windows, cores, access, infrastructure, local density limits and approvals can reduce yield or prevent conversion.</p></div>'+
  (r.listing_id==='CC-01'?'<p><b>Listing-reported proposal:</b> approximately 184 homes. This is the proposal recorded by the workbook, separate from the floor-area scenarios.</p>':'')+
  (r.listing_id==='CC-03'?'<p class="scope-note"><strong>Two different offering scopes.</strong> The workbook row records $4.95 million and 28,800 sq ft. The supplied LoopNet screenshot shows a $7.5 million, 47,800 sq ft portfolio with one flex and one office building. The estimate above uses only the workbook floor area.</p>':'')+
  '<h3>Workbook zoning</h3><table><thead><tr><th>Parcel acres</th><th>Zoning code</th><th>Zoning description</th></tr></thead><tbody><tr>'+[r.parcel_acres,r.zoning_code,r.zoning_description].map(v=>'<td>'+e(v||'Not supplied')+'</td>').join('')+'</tr></tbody></table><p>Workbook check: '+e(String(r.listing_checked_utc||'').slice(0,10))+'. Verify the current designation and listing availability with the city and broker.</p><p>'+link(sheet+'&range=L'+r.sheet_row+':N'+r.sheet_row,'Open these three cells')+' · '+link(r.listing_url,'Broker listing')+'</p><h3>Workbook research notes · pending review</h3><p>'+e(r.screen_notes||'No notes supplied.')+'</p><p>'+e(r.potential_pathways||'No pathway identified in the workbook.')+'</p><button class="btn" id="show-guide">Fast-track screening guide</button>';
