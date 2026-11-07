@@ -10,7 +10,14 @@ export function mountLandscout(D,icons,atlasFactory,globeFactory){
   let satelliteFailed=false;
   const photo=createPhotoView($('photoView'),D,()=>modes('3D'));
   let selected=null,imports=[],near=[],nearState='idle',official=D.regions.every(s=>Boolean(s.geometry)),mode='2D',cameraSeq=0,searchSeq=0,nearSeq=0,searchTimer,toastTimer,searchResults=[],globe,atlas;
-  const allRecords=()=>[...D.regions,...imports,...(selected?.kind==='place'?[selected]:[])];
+  let property=null;
+  const cameraTarget=()=>property||selected;
+  function selectProperty(row){
+    if(mode!=='2D')flat();
+    property={id:row.listing_id,kind:'listing',name:row.property_name,lat:Number(row.latitude),lon:Number(row.longitude),geometry:row.geometry,color:'#08764b',viewRange:650};
+    modes('2D');
+  }
+  const allRecords=()=>[...D.regions,...imports,...(property?[property]:[]),...(selected?.kind==='place'?[selected]:[])];
   const info=(k,v)=>'<div><dt>'+esc(k)+'</dt><dd>'+esc(v)+'</dd></div>';
   const coords=s=>Math.abs(s.lat).toFixed(4)+'° '+(s.lat<0?'S':'N')+' · '+Math.abs(s.lon).toFixed(4)+'° '+(s.lon<0?'W':'E');
   const btn=(id,label,symbol,primary=false)=>'<button id="'+id+'" class="btn'+(primary?' primary':'')+'">'+(symbol?icon(symbol):'')+esc(label)+'</button>';
@@ -51,7 +58,7 @@ export function mountLandscout(D,icons,atlasFactory,globeFactory){
     el.insertAdjacentHTML('beforeend',research);
     el.querySelectorAll('[data-rec]').forEach(b=>b.addEventListener('click',()=>choose(allRecords().find(s=>s.id===b.dataset.rec))));
     if($('back'))$('back').onclick=reset;if($('import'))$('import').onclick=()=>$('file').click();if($('nearby'))$('nearby').onclick=lookup;if($('saveSelection'))$('saveSelection').onclick=saveRecord;
-    $('legendTitle').textContent=selected?selected.name:'Orange County';
+    $('legendTitle').textContent=(mode!=='2D'&&property?property:selected)?.name||'Orange County';
     $('legendNote').textContent=selected?selected.boundary:(official?'Municipal boundaries · 6 study regions':'6 study locations');
     if(mode!=='2D')$('legendNote').textContent=photo.active?'Aerial perspective · flat terrain':globe.imageryStatus;
     $('sourceNote').innerHTML='Photography: USDA / USGS The National Map. Offshore context: NASA Blue Marble. Street map: OpenFreeMap Liberty with USGS Topo coverage. Place records: California public schools, CDPH, OCTA and <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap contributors (ODbL)</a>. City limits: <a href="'+D.cityInfo+'" target="_blank" rel="noopener">California Department of Technology</a>. City limits do not establish development eligibility.';
@@ -62,43 +69,45 @@ export function mountLandscout(D,icons,atlasFactory,globeFactory){
     $('scale').hidden=mode!=='2D';
     for(const [k,active] of [['aerial',!street],['streets',street]])$(k).setAttribute('aria-pressed',String(active));
   }
-  function modes(next){mode=next;offers?.mode(selected,mode);for(const [id,m] of [['two','2D'],['three','3D'],['orbit','Orbit']])$(id).setAttribute('aria-pressed',String(m===next));updateCredit();}
+  function modes(next){mode=next;$('legendTitle').textContent=(mode!=='2D'&&property?property:selected)?.name||'Orange County';$('orbit').textContent=next==='Orbit'?'Stop orbit':property?'Orbit property':'Orbit';offers?.mode(selected,mode);for(const [id,m] of [['two','2D'],['three','3D'],['orbit','Orbit']])$(id).setAttribute('aria-pressed',String(m===next));updateCredit();}
   function flat(){
     ++cameraSeq;photo.close();globe?.stop();$('globe').hidden=true;$('atlas').hidden=false;hideTip();modes('2D');atlas.resize();
     $('legendNote').textContent=selected?selected.boundary:'6 study regions';
   }
   function photoFallback(wanted='3D'){
-    satelliteFailed=true;globe.stop();$('globe').hidden=true;$('atlas').hidden=true;hideTip();photo.show(selected,wanted==='Orbit');modes(wanted);
+    satelliteFailed=true;globe.stop();$('globe').hidden=true;$('atlas').hidden=true;hideTip();photo.show(cameraTarget(),wanted==='Orbit');modes(wanted);
     $('legendNote').textContent='Aerial perspective · flat terrain';
     notice('The interactive globe could not start. Showing an aerial preview. Press 3D to retry.',7000);
   }
   async function perspective(wanted='3D'){
-    if(wanted==='Orbit'&&!selected){notice('Choose a region or parcel to orbit.');return;}
-    if(wanted==='Orbit'&&mode==='Orbit'){if(photo.active)photo.show(selected,false);else globe.stop();modes('3D');return;}
+    const focus=cameraTarget();
+    if(wanted==='Orbit'&&!focus){notice('Choose a region or parcel to orbit.');return;}
+    if(wanted==='Orbit'&&mode==='Orbit'){if(photo.active)photo.show(focus,false);else globe.stop();modes('3D');return;}
+    if(photo.active&&wanted==='Orbit'){photo.show(focus,true);modes('Orbit');return;}
     const seq=++cameraSeq,was3=mode!=='2D';satelliteFailed=false;if(!was3){$('globe').hidden=false;$('globe').style.visibility='hidden';}
     let timed=setTimeout(()=>{if(seq===cameraSeq)notice('Opening the 3D aerial view…',2500);},400);
     try{
       await globe.init();if(seq!==cameraSeq)return;
       if(globe.imageryStatus.startsWith('Photorealistic tiles unavailable'))globe.applyTerrain(window.LANDSCOUT_CONFIG?.ionPublicToken);
       photo.close();$('globe').style.visibility='';$('globe').hidden=false;$('atlas').hidden=true;hideTip();$('toast').hidden=true;$('legendNote').textContent=globe.imageryStatus;
-      globe.resize();globe.setRecords(allRecords(),selected,iconsVisible?near:[]);modes(wanted);
-      if(wanted==='Orbit'&&was3)globe.orbit(selected);
+      globe.resize();globe.setRecords(allRecords(),cameraTarget(),iconsVisible?near:[]);modes(wanted);
+      if(wanted==='Orbit'&&was3)globe.orbit(focus);
       else {
-        let target=selected;
-        if(wanted==='3D'&&!was3&&atlas.map.getZoom()>=14){
+        let target=focus;
+        if(!property&&wanted==='3D'&&!was3&&atlas.map.getZoom()>=14){
           const centre=atlas.map.getCenter(),bounds=atlas.map.getBounds();
           const viewRange=atlas.map.distance(bounds.getNorthWest(),bounds.getSouthWest())*1.35;
           target={lon:centre.lng,lat:centre.lat,viewRange:Math.max(300,viewRange)};
         }
-        globe.fly(target,wanted==='Orbit'?()=>{if(seq===cameraSeq)globe.orbit(selected);}:undefined);
+        globe.fly(target,wanted==='Orbit'?()=>{if(seq===cameraSeq)globe.orbit(focus);}:undefined);
       }
     }catch(e){if(seq!==cameraSeq)return;photoFallback(wanted);}
     finally{clearTimeout(timed);}
   }
-  function choose(s){if(!s)return;zoneOrigin=null;selected=s;near=[];nearState='idle';nearSeq++;hideTip();closeSearch();photo.setAmenities([]);atlas.setAmenities([]);atlas.setSelection(s);if(mode!=='2D')flat();zones.selectCity(s);atlas.fly(s);panel();$('panel').scrollTop=0;if(s.kind==='region'){lookup();}else perspective();}
-  function reset(){zoneOrigin=null;zones.selectCity(null);flat();selected=null;near=[];nearState='idle';nearSeq++;closeSearch();$('toast').hidden=true;atlas.setSelection(null);photo.setAmenities([]);atlas.setAmenities([]);atlas.home();panel();$('panel').scrollTop=0;}
+  function choose(s){if(!s)return;if(s.kind==='listing')return;property=null;zoneOrigin=null;selected=s;near=[];nearState='idle';nearSeq++;hideTip();closeSearch();photo.setAmenities([]);atlas.setAmenities([]);atlas.setSelection(s);if(mode!=='2D')flat();zones.selectCity(s);atlas.fly(s);panel();$('panel').scrollTop=0;if(s.kind==='region'){lookup();}else perspective();}
+  function reset(){property=null;zoneOrigin=null;zones.selectCity(null);flat();selected=null;near=[];nearState='idle';nearSeq++;closeSearch();$('toast').hidden=true;atlas.setSelection(null);photo.setAmenities([]);atlas.setAmenities([]);atlas.home();panel();$('panel').scrollTop=0;}
   async function lookup(){const target=selected;if(!target)return;const seq=++nearSeq;nearState='loading';panel();
-    try{const result=await D.nearby(zoneOrigin||target);if(seq!==nearSeq||selected!==target)return;near=result;nearState='done';const pins=iconsVisible?near:[];photo.setAmenities(pins);atlas.setAmenities(pins);globe.setRecords(allRecords(),selected,pins);}
+    try{const result=await D.nearby(zoneOrigin||target);if(seq!==nearSeq||selected!==target)return;near=result;nearState='done';const pins=iconsVisible?near:[];photo.setAmenities(pins);atlas.setAmenities(pins);globe.setRecords(allRecords(),cameraTarget(),pins);}
     catch{if(seq!==nearSeq||selected!==target)return;nearState='failed';}
     panel();
   }
@@ -116,7 +125,7 @@ export function mountLandscout(D,icons,atlasFactory,globeFactory){
     searchTimer=setTimeout(async()=>{try{const remote=await D.photon(q);if(seq!==searchSeq)return;const rows=[...local,...remote.filter(x=>!local.some(r=>r.name.toLowerCase()===x.name.toLowerCase()))].slice(0,8);results(rows,rows.length?'':'No places found in the Orange County search area.');}catch{if(seq===searchSeq)results(local,'Address service unavailable. Local study regions remain searchable.');}},330);
   }
   const callbacks={imagery:label=>{if(mode!=='2D'&&!photo.active)$('legendNote').textContent=label;},pick:choose,tip,hideTip,notice,scale,manual:()=>{globe.stop();modes('3D');},failure:()=>photoFallback(mode==='Orbit'?'Orbit':'3D'),basemapChanged:()=>updateCredit()};
-  atlas=atlasFactory($('raster-map'),D,callbacks);globe=globeFactory($('globe'),D,callbacks);globe.setRecords(allRecords(),null,[]);offers=opportunities(atlas.map,D.regions,()=>{if(mode!=='2D')flat();});zones=zoningInspector(atlas.map,point=>{zoneOrigin={lon:point.lng,lat:point.lat};lookup();});
+  atlas=atlasFactory($('raster-map'),D,callbacks);globe=globeFactory($('globe'),D,callbacks);globe.setRecords(allRecords(),null,[]);offers=opportunities(atlas.map,D.regions,selectProperty,perspective);zones=zoningInspector(atlas.map,point=>{zoneOrigin={lon:point.lng,lat:point.lat};lookup();});
   $('brand').onclick=reset;$('home').onclick=reset;$('two').onclick=flat;$('three').onclick=()=>perspective();$('orbit').onclick=()=>perspective('Orbit');
   $('north').onclick=()=>{if(mode==='2D')notice('North is up in the county atlas.',2000);else if(photo.active){photo.north();modes('3D');}else perspective();};
   $('zoomIn').onclick=()=>(mode==='2D')?atlas.zoomBy(1):(photo.active?photo.zoom(1):globe.zoomBy(1));$('zoomOut').onclick=()=>(mode==='2D')?atlas.zoomBy(-1):(photo.active?photo.zoom(-1):globe.zoomBy(-1));
@@ -130,7 +139,7 @@ export function mountLandscout(D,icons,atlasFactory,globeFactory){
     window.LANDSCOUT_CONFIG={...(window.LANDSCOUT_CONFIG||{}),ionPublicToken:token,photoreal};
     $('terrainToken').value='';globe.applyTerrain(token);satelliteFailed=false;panel();$('dialog').close();if(token&&mode!=='2D'){flat();perspective();}notice(token?'3D configuration applied to this tab.':'Using the ellipsoid terrain surface.');
   };
-  $('showPOI').onchange=()=>{iconsVisible=$('showPOI').checked;const pins=iconsVisible?near:[];photo.setAmenities(pins);atlas.setAmenities(pins);globe.setRecords(allRecords(),selected,pins);};
+  $('showPOI').onchange=()=>{iconsVisible=$('showPOI').checked;const pins=iconsVisible?near:[];photo.setAmenities(pins);atlas.setAmenities(pins);globe.setRecords(allRecords(),cameraTarget(),pins);};
   $('settings').onclick=()=>{$('retry3d').hidden=!satelliteFailed;$('dialog').showModal();};$('retry3d').onclick=()=>{satelliteFailed=false;$('dialog').close();flat();perspective();};$('closeDialog').onclick=()=>$('dialog').close();
   for(const [id,key] of [['showLabels','labels'],['showRegions','regions']])$(id).onchange=()=>{atlas.settings[key]=$(id).checked;atlas.draw();if(key==='labels')globe.setLabels(atlas.settings.labels);};
   $('file').onchange=async e=>{const file=e.target.files[0];if(!file)return;try{
