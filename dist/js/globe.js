@@ -90,6 +90,14 @@ export function createGlobe(container,D,callbacks){
           viewer.entities.add({polygon:{hierarchy,material:C.Color.fromCssColorString(s.color).withAlpha(.5)},polyline:{positions:toPos(rings[0]),width:chosen?3:1.5,clampToGround:true,material:C.Color.fromCssColorString(chosen?'#592879':'#795691')},properties:{sid:s.id}});
         }
       }
+      if(s.kind==='listing'&&chosen){
+        const icon='<svg xmlns="http://www.w3.org/2000/svg" width="36" height="46" viewBox="0 0 36 46"><path fill="#086744" stroke="white" stroke-width="2.5" d="M18 44S2 28 2 18a16 16 0 1 1 32 0c0 10-16 26-16 26Z"/><path fill="white" d="M11 12h14v14h-5v-5h-4v5h-5z"/><path fill="#086744" d="M14 15h3v3h-3zm5 0h3v3h-3z"/></svg>';
+        const anchor={heightReference:C.HeightReference.CLAMP_TO_GROUND,disableDepthTestDistance:Number.POSITIVE_INFINITY};
+        viewer.entities.add({name:s.name,position:C.Cartesian3.fromDegrees(s.lon,s.lat),properties:{sid:s.id},
+          billboard:{...anchor,image:'data:image/svg+xml;charset=utf-8,'+encodeURIComponent(icon),verticalOrigin:C.VerticalOrigin.BOTTOM},
+          label:{...anchor,text:s.name,font:'bold 15px sans-serif',showBackground:true,backgroundColor:C.Color.fromCssColorString('#104b35'),fillColor:C.Color.WHITE,pixelOffset:new C.Cartesian2(0,-57)}});
+        continue;
+      }
       if(labelVisible||s.id===picked?.id)viewer.entities.add({position:C.Cartesian3.fromDegrees(s.lon,s.lat),point:{pixelSize:chosen?9:5,color:C.Color.fromCssColorString('#5f849f'),outlineColor:C.Color.WHITE,outlineWidth:2,disableDepthTestDistance:Number.POSITIVE_INFINITY},label:labelVisible?{text:s.name,font:'13px sans-serif',fillColor:C.Color.WHITE,style:C.LabelStyle.FILL_AND_OUTLINE,outlineWidth:3,outlineColor:C.Color.fromCssColorString('#263643'),pixelOffset:new C.Cartesian2(0,-17),disableDepthTestDistance:Number.POSITIVE_INFINITY}:undefined,properties:{sid:s.id}});
     }
     for(const a of places.filter(x=>Number.isFinite(x.lon)))viewer.entities.add({position:C.Cartesian3.fromDegrees(a.lon,a.lat),name:a.name+' · '+a.cat,billboard:{image:amenityIcon(a.cat),width:28,height:28,disableDepthTestDistance:Number.POSITIVE_INFINITY}});
