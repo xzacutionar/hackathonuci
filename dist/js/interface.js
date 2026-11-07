@@ -53,7 +53,7 @@ export function mountLandscout(D,icons,atlasFactory,globeFactory){
     if($('back'))$('back').onclick=reset;if($('import'))$('import').onclick=()=>$('file').click();if($('nearby'))$('nearby').onclick=lookup;if($('saveSelection'))$('saveSelection').onclick=saveRecord;
     $('legendTitle').textContent=selected?selected.name:'Orange County';
     $('legendNote').textContent=selected?selected.boundary:(official?'Municipal boundaries · 6 study regions':'6 study locations');
-    if(mode!=='2D')$('legendNote').textContent=photo.active?'Aerial perspective · flat terrain':'3D aerial view · USDA / USGS';
+    if(mode!=='2D')$('legendNote').textContent=photo.active?'Aerial perspective · flat terrain':globe.imageryStatus;
     $('sourceNote').innerHTML='Photography: USDA / USGS The National Map. Offshore context: NASA Blue Marble. Street map: OpenFreeMap Liberty with USGS Topo coverage. Place records: California public schools, CDPH, OCTA and <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap contributors (ODbL)</a>. City limits: <a href="'+D.cityInfo+'" target="_blank" rel="noopener">California Department of Technology</a>. City limits do not establish development eligibility.';
   }
   function updateCredit(){
@@ -70,19 +70,28 @@ export function mountLandscout(D,icons,atlasFactory,globeFactory){
   function photoFallback(wanted='3D'){
     satelliteFailed=true;globe.stop();$('globe').hidden=true;$('atlas').hidden=true;hideTip();photo.show(selected,wanted==='Orbit');modes(wanted);
     $('legendNote').textContent='Aerial perspective · flat terrain';
-    $('toast').hidden=true;
+    notice('The interactive globe could not start. Showing an aerial preview. Press 3D to retry.',7000);
   }
   async function perspective(wanted='3D'){
     if(wanted==='Orbit'&&!selected){notice('Choose a region or parcel to orbit.');return;}
     if(wanted==='Orbit'&&mode==='Orbit'){if(photo.active)photo.show(selected,false);else globe.stop();modes('3D');return;}
-    const seq=++cameraSeq,was3=mode!=='2D';if(satelliteFailed){photoFallback(wanted);return;}if(!was3){$('globe').hidden=false;$('globe').style.visibility='hidden';}
+    const seq=++cameraSeq,was3=mode!=='2D';satelliteFailed=false;if(!was3){$('globe').hidden=false;$('globe').style.visibility='hidden';}
     let timed=setTimeout(()=>{if(seq===cameraSeq)notice('Opening the 3D aerial view…',2500);},400);
     try{
       await globe.init();if(seq!==cameraSeq)return;
-      photo.close();$('globe').style.visibility='';$('globe').hidden=false;$('atlas').hidden=true;hideTip();$('toast').hidden=true;$('legendNote').textContent='3D aerial view · USDA / USGS';
+      if(globe.imageryStatus.startsWith('Photorealistic tiles unavailable'))globe.applyTerrain(window.LANDSCOUT_CONFIG?.ionPublicToken);
+      photo.close();$('globe').style.visibility='';$('globe').hidden=false;$('atlas').hidden=true;hideTip();$('toast').hidden=true;$('legendNote').textContent=globe.imageryStatus;
       globe.resize();globe.setRecords(allRecords(),selected,iconsVisible?near:[]);modes(wanted);
       if(wanted==='Orbit'&&was3)globe.orbit(selected);
-      else globe.fly(selected,wanted==='Orbit'?()=>{if(seq===cameraSeq)globe.orbit(selected);}:undefined);
+      else {
+        let target=selected;
+        if(wanted==='3D'&&!was3&&atlas.map.getZoom()>=14){
+          const centre=atlas.map.getCenter(),bounds=atlas.map.getBounds();
+          const viewRange=atlas.map.distance(bounds.getNorthWest(),bounds.getSouthWest())*1.35;
+          target={lon:centre.lng,lat:centre.lat,viewRange:Math.max(300,viewRange)};
+        }
+        globe.fly(target,wanted==='Orbit'?()=>{if(seq===cameraSeq)globe.orbit(selected);}:undefined);
+      }
     }catch(e){if(seq!==cameraSeq)return;photoFallback(wanted);}
     finally{clearTimeout(timed);}
   }
@@ -106,7 +115,7 @@ export function mountLandscout(D,icons,atlasFactory,globeFactory){
     if(q.length<3)return;
     searchTimer=setTimeout(async()=>{try{const remote=await D.photon(q);if(seq!==searchSeq)return;const rows=[...local,...remote.filter(x=>!local.some(r=>r.name.toLowerCase()===x.name.toLowerCase()))].slice(0,8);results(rows,rows.length?'':'No places found in the Orange County search area.');}catch{if(seq===searchSeq)results(local,'Address service unavailable. Local study regions remain searchable.');}},330);
   }
-  const callbacks={pick:choose,tip,hideTip,notice,scale,manual:()=>{globe.stop();modes('3D');},failure:()=>photoFallback(mode==='Orbit'?'Orbit':'3D'),basemapChanged:()=>updateCredit()};
+  const callbacks={imagery:label=>{if(mode!=='2D'&&!photo.active)$('legendNote').textContent=label;},pick:choose,tip,hideTip,notice,scale,manual:()=>{globe.stop();modes('3D');},failure:()=>photoFallback(mode==='Orbit'?'Orbit':'3D'),basemapChanged:()=>updateCredit()};
   atlas=atlasFactory($('raster-map'),D,callbacks);globe=globeFactory($('globe'),D,callbacks);globe.setRecords(allRecords(),null,[]);offers=opportunities(atlas.map,D.regions,()=>{if(mode!=='2D')flat();});zones=zoningInspector(atlas.map,point=>{zoneOrigin={lon:point.lng,lat:point.lat};lookup();});
   $('brand').onclick=reset;$('home').onclick=reset;$('two').onclick=flat;$('three').onclick=()=>perspective();$('orbit').onclick=()=>perspective('Orbit');
   $('north').onclick=()=>{if(mode==='2D')notice('North is up in the county atlas.',2000);else if(photo.active){photo.north();modes('3D');}else perspective();};
