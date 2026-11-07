@@ -80,7 +80,11 @@ export function createRaster(container,D,callbacks){
     map.invalidateSize({pan:false});
   }
   function fly(s){
-    if(s.kind==='region'&&s.geometry){map.stop();map.fitBounds(L.geoJSON(s.geometry).getBounds(),{padding:[30,30],animate:false});return;}
+    if(s.kind==='region'&&s.geometry){
+      map.stop();
+      map.flyToBounds(L.geoJSON(s.geometry).getBounds(),{padding:[30,30],animate:!reduced(),duration:1.35});
+      return;
+    }
     const base=s.kind==='parcel'&&s.geometry?L.geoJSON(s.geometry).getBounds():null;
     const z=base?Math.min(18,map.getBoundsZoom(base,false,[66,70])):13.75;
     map.stop();map.flyTo([s.lat,s.lon],z,{animate:!reduced(),duration:1.05});
