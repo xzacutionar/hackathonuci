@@ -5,7 +5,7 @@ import {amenityIcon} from './amenity-icons.js';
 const escape=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const sheet='https://docs.google.com/spreadsheets/d/17NlGpn94b18pJvoRaVuTfZPA_nZlxd4IETw1rf1kFxY/edit#gid=560422622';
 const pin='<img class="sale-pin" src="/imagery/commercial-building.svg" alt="">';
-export function opportunities(map,regions,showMap){
+export function opportunities(map,regions,showMap,view3D){
   map.createPane('saleParcel').style.zIndex='460';
   const layer=L.layerGroup().addTo(map);
   const leaders=L.layerGroup().addTo(layer),pins=[];
@@ -49,7 +49,7 @@ export function opportunities(map,regions,showMap){
     return '<div class="property-pop"><small>Commercial conversion candidate</small><h3>'+escape(r.property_name)+'</h3><div data-preview-photo></div><p>'+escape(r.address)+'</p><section class="property-laws compact" data-property-laws></section><dl>'+notes.filter(x=>x[1]).map(([k,v])=>'<dt>'+escape(k)+'</dt><dd>'+escape(v)+'</dd>').join('')+'</dl>'+(r.listing_id==='CC-03'?'<p>Workbook figures cover one building. The supplied photo gallery is a separate two-building portfolio.</p>':'')+'<div class="yield-preview"><b>'+escape(yieldLabel(r))+'</b><small>Floor-area scenario</small><button class="btn" data-property-review>Photos, zoning &amp; unit estimate</button></div><details><summary>Workbook screening notes</summary><p>'+escape(r.screen_notes||'No notes supplied.')+'</p><p>'+escape(r.potential_pathways||'Pathway review pending.')+'</p></details><p class="property-date">Workbook checked '+escape(String(r.listing_checked_utc).slice(0,10))+'. Confirm availability with the broker and conversion eligibility with the city.</p><p>'+(/^https?:\/\//.test(r.listing_url)?'<a target="_blank" rel="noopener" href="'+escape(r.listing_url)+'">View listing ↗</a> · ':'')+'<a target="_blank" rel="noopener" href="'+sheet+'&range=A'+r.sheet_row+'">Sheet row ↗</a></p></div>';
   }
   function open(r){
-    showMap();map.closePopup();clear();visible=true;layer.addTo(map);paintKey();
+    showMap(r);map.closePopup();clear();visible=true;layer.addTo(map);paintKey();
     const at=[Number(r.latitude),Number(r.longitude)];
     map.stop();
     outline=L.geoJSON(r.geometry,{pane:"saleParcel",interactive:false,style:{color:'#106344',weight:3,fillColor:'#46a87b',fillOpacity:.32}}).addTo(map);
@@ -66,9 +66,10 @@ export function opportunities(map,regions,showMap){
     const popup=L.popup({maxWidth:360,maxHeight:335,offset:[0,-12]}).setLatLng(at).setContent(details(r)).openOn(map);
     const root=popup.getElement();
     showPropertyLaws(root.querySelector('[data-property-laws]'),r,true);
-    inspectListing(r);
-    root.querySelector('[data-property-review]').onclick=()=>inspectListing(r);
-    photoRecords(r.listing_id).then(records=>{if(!root.isConnected||!records[0])return;const p=records[0],target=root.querySelector('[data-preview-photo]');target.innerHTML='<button class="preview-photo" aria-label="Open property photos"><img src="'+escape(thumbnailUrl(p))+'" alt="'+escape(p.caption)+'"></button>';target.querySelector('button').onclick=()=>inspectListing(r,'photos');}).catch(()=>{});
+    const review=(section='laws')=>inspectListing(r,section,view3D);
+    review();
+    root.querySelector('[data-property-review]').onclick=()=>review();
+    photoRecords(r.listing_id).then(records=>{if(!root.isConnected||!records[0])return;const p=records[0],target=root.querySelector('[data-preview-photo]');target.innerHTML='<button class="preview-photo" aria-label="Open property photos"><img src="'+escape(thumbnailUrl(p))+'" alt="'+escape(p.caption)+'"></button>';target.querySelector('button').onclick=()=>review('photos');}).catch(()=>{});
   }
   function renderList(){
     const box=document.getElementById('opportunity-list');if(!box)return;
