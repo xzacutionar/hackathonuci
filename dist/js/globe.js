@@ -3,6 +3,15 @@ export function createGlobe(container,D,callbacks){
   const cdn='/vendor/cesium/';let viewer=null,engine=null,loading=null,tiling=null,table=[],picked=null,places=[],rotating=false,raf=0,angle=0,orbitCenter,range=5000;
   let terrainSeq=0,photorealTiles=null;
   let labelVisible=true,lastTileError=0;
+  const service='https://landscout-3d-imagery.xzacutionar.chatgpt.site/photoreal';
+  let imageryStatus='Loading 3D imagery…';
+  function status(message){imageryStatus=message;callbacks.imagery?.(message);}
+  async function managedResource(C){
+    const response=await fetch(service,{signal:AbortSignal.timeout(18000)});
+    if(!response.ok)throw Error('Photorealistic tiles unavailable');
+    const asset=await response.json();
+    return new C.Resource({url:asset.url,credits:asset.attributions.map(a=>new C.Credit(a.html,true))});
+  }
   function library(){
     if(window.Cesium)return Promise.resolve(window.Cesium);
     return new Promise((resolve,reject)=>{
@@ -23,16 +32,17 @@ export function createGlobe(container,D,callbacks){
       viewer.scene.globe.baseColor=C.Color.fromCssColorString('#b7c5c6');viewer.scene.globe.depthTestAgainstTerrain=false;
       tiling=new C.UrlTemplateImageryProvider({url:'https://basemap.nationalmap.gov/arcgis/rest/services/USGSImageryOnly/MapServer/tile/{z}/{y}/{x}',maximumLevel:17,credit:new C.Credit('USDA · USGS The National Map, Orthoimagery',true)});
       tiling.errorEvent.addEventListener(()=>{if(!lastTileError){lastTileError=Date.now();viewer.scene.requestRender();}});
-      const world=await C.TileMapServiceImageryProvider.fromUrl(cdn+'Assets/Textures/NaturalEarthII');
-      viewer.imageryLayers.addImageryProvider(world);
-      viewer.imageryLayers.addImageryProvider(tiling);
+      const world=C.TileMapServiceImageryProvider.fromUrl(cdn+'Assets/Textures/NaturalEarthII');
+      viewer.imageryLayers.add(C.ImageryLayer.fromProviderAsync(world));
+
       // Prefer local, georeferenced imagery inside the study area, including without network access.
       for(const shot of D.images){
         const rect=C.Rectangle.fromDegrees(...shot.bounds);
-        const local=await C.SingleTileImageryProvider.fromUrl('/imagery/'+shot.geographicFile,{rectangle:rect,credit:new C.Credit('USDA · USGS The National Map',true)});
-        viewer.imageryLayers.addImageryProvider(local);
+        const local=C.SingleTileImageryProvider.fromUrl('/imagery/'+shot.geographicFile,{rectangle:rect,credit:new C.Credit('USDA · USGS The National Map',true)});
+        viewer.imageryLayers.add(C.ImageryLayer.fromProviderAsync(local));
       }
-      if(publicToken)applyTerrain(publicToken);
+      viewer.imageryLayers.addImageryProvider(tiling);
+      applyTerrain(publicToken);
       const handler=new C.ScreenSpaceEventHandler(viewer.scene.canvas);
       handler.setInputAction(m=>{const id=viewer.scene.pick(m.position)?.id?.properties?.sid?.getValue();if(id)callbacks.pick(table.find(x=>x.id===id));},C.ScreenSpaceEventType.LEFT_CLICK);
       handler.setInputAction(m=>{const id=viewer.scene.pick(m.endPosition)?.id?.properties?.sid?.getValue(),rec=table.find(x=>x.id===id);if(rec){const b=container.getBoundingClientRect();callbacks.tip({clientX:b.left+m.endPosition.x,clientY:b.top+m.endPosition.y},rec);}else callbacks.hideTip();},C.ScreenSpaceEventType.MOUSE_MOVE);
@@ -47,21 +57,26 @@ export function createGlobe(container,D,callbacks){
     if(photorealTiles){viewer.scene.primitives.remove(photorealTiles);photorealTiles=null;}
     viewer.scene.globe.show=true;
     try{
-      const wantTiles=Boolean(token&&window.LANDSCOUT_CONFIG?.photoreal);
+      const wantTiles=window.LANDSCOUT_CONFIG?.photoreal??true;
       if(wantTiles){
-        const resource=await engine.IonResource.fromAssetId(2275207,{accessToken:token});
+        status('Loading photorealistic 3D tiles…');
+        const resource=token?await engine.IonResource.fromAssetId(2275207,{accessToken:token}):await managedResource(engine);
         const tiles=await engine.Cesium3DTileset.fromUrl(resource,{showCreditsOnScreen:true});
         if(seq!==terrainSeq||!viewer){tiles.destroy();return;}
         photorealTiles=viewer.scene.primitives.add(tiles);
+        tiles.initialTilesLoaded.addEventListener(()=>{
+          if(seq!==terrainSeq)return;
+          status('Photorealistic 3D · Google Maps');
+        });
         viewer.terrainProvider=new engine.EllipsoidTerrainProvider();
-        viewer.scene.requestRender();callbacks.notice('Google Photorealistic 3D Tiles enabled.');
-        tiles.tileFailed.addEventListener(()=>{if(seq===terrainSeq)callbacks.notice('Some Google 3D tiles are unavailable for this view.');});
+        viewer.scene.requestRender();
+        tiles.tileFailed.addEventListener(()=>{if(seq===terrainSeq)status('Some 3D tiles are unavailable · aerial imagery underneath');});
       }else{
         const terrain=token?await engine.createWorldTerrainAsync():new engine.EllipsoidTerrainProvider();
-        if(seq===terrainSeq&&viewer){viewer.terrainProvider=terrain;viewer.scene.requestRender();}
+        if(seq===terrainSeq&&viewer){viewer.terrainProvider=terrain;status('3D aerial imagery · USDA / USGS');viewer.scene.requestRender();}
       }
     }catch{
-      if(seq===terrainSeq)callbacks.notice('Ion content is unavailable. Check the token’s asset access and allowed Site URL. Aerial imagery is still available.',8000);
+      if(seq===terrainSeq){status('Photorealistic tiles unavailable · showing aerial imagery');callbacks.notice('Cesium ion could not load the 3D asset. Check asset access or try 3D again.',8000);}
     }
   }
   function refresh(){
@@ -86,10 +101,10 @@ export function createGlobe(container,D,callbacks){
     function step(ts){if(!rotating)return;if(last)angle+=Math.min(65,ts-last)*.000065;last=ts;viewer.camera.lookAt(orbitCenter,new C.HeadingPitchRange(angle,-.63,range));viewer.scene.requestRender();raf=requestAnimationFrame(step);}raf=requestAnimationFrame(step);
   }
   function fly(s,after){
-    stop();const C=engine;range=s?.kind==='parcel'?1300:s?4800:72000;
+    stop();const C=engine;range=s?.viewRange??(s?.kind==='parcel'?1300:s?4800:72000);
     if(s?.kind==='parcel'&&s.geometry){const b=D.bbox(s.geometry);range=Math.max(520,Math.min(150000,D.distance(b[1],b[0],b[3],b[2])*1600));}
     const at=s||{lon:-117.80,lat:33.70};const sphere=new C.BoundingSphere(C.Cartesian3.fromDegrees(at.lon,at.lat),1);
     viewer.camera.flyToBoundingSphere(sphere,{duration:matchMedia('(prefers-reduced-motion: reduce)').matches?0:1.45,offset:new C.HeadingPitchRange(0,s?-.64:-1.29,range),complete:after});viewer.scene.requestRender();
   }
-  return {init,fly,stop,orbit,applyTerrain,setLabels(visible){labelVisible=visible;refresh();},setRecords(rows,s,near){table=rows;picked=s;places=near;refresh();},zoomBy(delta){if(!viewer)return;if(rotating){range=Math.max(180,Math.min(120000,range*(delta>0?.65:1.5)));return;}const magnitude=viewer.camera.positionCartographic.height*.38;delta>0?viewer.camera.zoomIn(magnitude):viewer.camera.zoomOut(magnitude);viewer.scene.requestRender();},resize(){viewer?.resize();viewer?.scene.requestRender();},get active(){return !!viewer;}};
+  return {init,fly,stop,orbit,applyTerrain,setLabels(visible){labelVisible=visible;refresh();},setRecords(rows,s,near){table=rows;picked=s;places=near;refresh();},zoomBy(delta){if(!viewer)return;if(rotating){range=Math.max(180,Math.min(120000,range*(delta>0?.65:1.5)));return;}const magnitude=viewer.camera.positionCartographic.height*.38;delta>0?viewer.camera.zoomIn(magnitude):viewer.camera.zoomOut(magnitude);viewer.scene.requestRender();},resize(){viewer?.resize();viewer?.scene.requestRender();},get imageryStatus(){return imageryStatus;},get active(){return !!viewer;}};
 }
