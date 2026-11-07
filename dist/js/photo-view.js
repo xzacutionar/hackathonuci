@@ -67,10 +67,10 @@ export function createPhotoView(root,model,manual){
     frame=requestAnimationFrame(tick);
   }
   function show(s,orbit){
-    parcel=s?.kind==='parcel'?s:null;
+    parcel=(s?.kind==='parcel'||s?.kind==='listing')?s:null;
     const at=s||{id:'county',lon:-117.8,lat:33.7,name:'Orange County'};
-    if(!active||target!==at){target=at;z=s?(s.kind==='parcel'?15.2:14.7):10.8;yaw=0;pitch=s?36:29;}
-    active=true;root.hidden=false;pin.textContent=at.name;layout();if(orbit)rotate();else stop();
+    if(!active||target!==at){target=at;z=s?.kind==='listing'?16:s?(s.kind==='parcel'?15.2:14.7):10.8;yaw=0;pitch=s?36:29;}
+    active=true;root.hidden=false;pin.textContent=at.kind==='listing'?'📍 '+at.name:at.name;layout();if(orbit)rotate();else stop();
   }
   function close(){stop();active=false;root.hidden=true;document.querySelector('#north svg').style.transform='';}
   function zoom(by){if(!active)return;z=Math.min(16,Math.max(9,z+by*.5));layout();}
