@@ -29,3 +29,7 @@ html,body{background:#f7f8f6}.top{height:67px;padding:0 25px;gap:18px}.brand{fon
 
 .property-laws{background:#f3f7f4;border:1px solid #dce6de;border-radius:10px;padding:14px 16px;margin:10px 0 15px}.property-laws h3{margin:0 0 6px}.property-laws h4{margin:13px 0 5px}.property-laws p{margin:6px 0}.property-laws .district-label{font-size:16px;font-weight:650;color:#285b47}.property-law-links{display:flex;flex-wrap:wrap;gap:8px 14px;margin-top:12px}.property-laws.compact{padding:9px;font-size:12px}.property-laws.compact .district-label{font-size:13px}
 .listing-sections{display:flex;gap:8px;margin:9px 0}.review-dialog .property-laws,.review-dialog .listing-gallery{scroll-margin-top:78px}
+
+.sideHead .back{min-height:44px;padding:8px 15px;border:1px solid #638576;border-radius:9px;background:#edf5ef;color:#173f30;font-size:15px;font-weight:700;gap:8px;cursor:pointer}
+.sideHead .back svg{width:20px;height:20px}
+.sideHead .back:hover,.sideHead .back:focus-visible{background:#d9ebdf;outline:2px solid #23654b;outline-offset:2px}
