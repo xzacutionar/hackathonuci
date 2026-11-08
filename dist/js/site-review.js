@@ -32,7 +32,46 @@ export async function photoRecords(id){
  if(!photos)photos=get('listing-photos.json').catch(err=>{photos=null;throw err;});
  return (await photos)[id]||[];
 }
-export function thumbnailUrl(photo){return photo.file.startsWith('/')?photo.file:'/'+photo.file;}
+export function thumbnailUrl(photo){return photo.file.startsWith('/')||photo.file.startsWith('https://')?photo.file:'/'+photo.file;}
+function propertyGallery(gallery,records,name){
+ if(!records.length){gallery.textContent='No listing photos available.';return;}
+ const multiple=records.length>1;
+ gallery.setAttribute('role','region');
+ gallery.setAttribute('aria-label','Photos of '+name);
+ gallery.innerHTML='<figure><div class="photo-stage"><img alt=""><span class="photo-error" hidden>Photo unavailable</span></div><figcaption></figcaption></figure>';
+ const image=gallery.querySelector('img'),error=gallery.querySelector('.photo-error'),caption=gallery.querySelector('figcaption');
+ image.onerror=()=>{image.hidden=true;error.hidden=false;};
+ let index=0,counter;
+ function show(next){
+   index=(next+records.length)%records.length;
+   const photo=records[index];
+   error.hidden=true;image.hidden=false;image.alt=photo.caption+' · '+name;
+   image.src=thumbnailUrl(photo);
+   caption.innerHTML=e(photo.caption)+' '+link(photo.url,'Photo source');
+   if(counter)counter.textContent='Photo '+(index+1)+' of '+records.length;
+ }
+ if(multiple){
+   gallery.setAttribute('aria-roledescription','carousel');
+   gallery.insertAdjacentHTML('beforeend','<div class="photo-controls"><button class="btn" type="button" aria-label="Previous photo">← Previous</button><span role="status" aria-live="polite"></span><button class="btn" type="button" aria-label="Next photo">Next →</button></div>');
+   counter=gallery.querySelector('[role=status]');
+   const [previous,next]=gallery.querySelectorAll('button');
+   previous.onclick=()=>show(index-1);next.onclick=()=>show(index+1);
+   gallery.onkeydown=event=>{
+     if(!['ArrowLeft','ArrowRight'].includes(event.key))return;
+     event.preventDefault();show(index+(event.key==='ArrowLeft'?-1:1));
+   };
+   let start=null;
+   const stage=gallery.querySelector('.photo-stage');
+   stage.ontouchstart=event=>{start=event.touches.length===1?event.touches[0]:null;};
+   stage.ontouchcancel=()=>{start=null;};
+   stage.ontouchend=event=>{
+     if(!start)return;
+     const end=event.changedTouches[0],dx=end.clientX-start.clientX,dy=end.clientY-start.clientY;start=null;
+     if(Math.abs(dx)>40&&Math.abs(dx)>Math.abs(dy)*1.4)show(index+(dx<0?1:-1));
+   };
+ }
+ show(0);
+}
 let dialog,version=0;
 function start(title){
  version++;if(!dialog){dialog=document.createElement('dialog');dialog.className='review-dialog';document.body.append(dialog);}
@@ -69,5 +108,7 @@ export function inspectListing(r,startAt='laws',view3D){
  showPropertyLaws(body.querySelector('[data-property-laws]'),r);
  body.querySelector('#show-guide').onclick=guide;
  body.insertAdjacentHTML('beforeend','<h3>Open evidence checks</h3><p class="scope-note">Unresolved: actual tenant and withdrawal history, site control, hazard and historic exclusions, and project affordability and labour commitments. Review these against a specific pathway before treating the site as a fast-track prospect.</p>');
- photoRecords(r.listing_id).then(records=>{if(seq!==version)return;const gallery=body.querySelector('.listing-gallery');gallery.innerHTML=records.map(p=>'<figure><img src="'+e(thumbnailUrl(p))+'" alt="'+e(p.caption)+'"><figcaption>'+e(p.caption)+' '+link(p.url,'Source')+'</figcaption></figure>').join('');}).catch(()=>{});
+ photoRecords(r.listing_id).then(records=>{
+   if(seq===version)propertyGallery(body.querySelector('.listing-gallery'),records,r.property_name);
+ }).catch(()=>{if(seq===version)body.querySelector('.listing-gallery').textContent='Listing photos could not load.';});
 }
