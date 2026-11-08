@@ -33,3 +33,29 @@ html,body{background:#f7f8f6}.top{height:67px;padding:0 25px;gap:18px}.brand{fon
 .sideHead .back{min-height:44px;padding:8px 15px;border:1px solid #638576;border-radius:9px;background:#edf5ef;color:#173f30;font-size:15px;font-weight:700;gap:8px;cursor:pointer}
 .sideHead .back svg{width:20px;height:20px}
 .sideHead .back:hover,.sideHead .back:focus-visible{background:#d9ebdf;outline:2px solid #23654b;outline-offset:2px}
+
+.guide-open{flex:none;border:1px solid #9eb6a9;border-radius:8px;padding:9px 13px;background:white;color:#194b37;font:inherit;font-weight:650;cursor:pointer}
+#welcome-guide{width:min(760px,calc(100vw - 28px));max-height:calc(100dvh - 28px);padding:0;border:1px solid #b9c8be;border-radius:21px;background:#fafcf9;color:#183529;box-shadow:0 24px 100px #06171055;overscroll-behavior:contain}
+#welcome-guide::backdrop{background:#0b241ecc;backdrop-filter:blur(4px)}
+#welcome-guide[open]{animation:guide-arrive .32s ease-out}
+@keyframes guide-arrive{from{opacity:0;transform:translateY(15px)}to{opacity:1;transform:none}}
+.guide-top,.guide-footer,.guide-actions,#guide-steps{display:flex;align-items:center}
+.guide-top,.guide-footer{justify-content:space-between;gap:12px;padding:16px 26px}
+.guide-top strong{letter-spacing:.08em}.guide-top strong span{color:#47765a}
+#welcome-guide button{font:inherit;font-size:14px;font-weight:650;cursor:pointer;border-radius:8px}
+#guide-skip,#guide-back{border:1px solid #c7d3cb;background:transparent;color:#294538;padding:8px 12px}
+.guide-media{position:relative;background:#19332a;aspect-ratio:760/342}
+.guide-media video{display:block;width:100%;height:100%;object-fit:cover}
+#guide-play{position:absolute;right:12px;bottom:12px;border:1px solid #ffffff70;background:#102d24ed;color:white;padding:7px 12px}
+.guide-body{padding:21px 28px 4px}
+#guide-count{color:#48765b;font-size:11px;font-weight:750;letter-spacing:.15em}
+#guide-title{margin:6px 0;font-size:clamp(26px,4vw,36px);letter-spacing:-.035em}
+#guide-copy{margin:0;line-height:1.5;max-width:65ch}
+.guide-footer{padding-bottom:22px}.guide-actions{gap:8px}
+#guide-steps button{width:24px;height:32px;border:0;background:transparent;padding:6px 2px}
+#guide-steps button::after{content:'';display:block;height:4px;border-radius:4px;background:#c8d7cd}
+#guide-steps button[aria-current=step]::after{background:#21683f}
+#guide-back:disabled{opacity:.4;cursor:default}
+#guide-next{border:0;background:#174c36;color:#fff;padding:10px 15px}
+@media(max-width:660px){.guide-open{padding:8px;font-size:13px}.guide-top,.guide-footer{padding:12px 15px}.guide-body{padding:16px}.guide-footer{flex-wrap:wrap}#guide-steps button{width:19px}}
+@media(prefers-reduced-motion:reduce){#welcome-guide[open]{animation:none}}
