@@ -23,7 +23,7 @@ const questions={
  'Open land':['The designation helps identify land that may warrant early conservation or public-use review.','Check preservation restrictions, easements and public ownership before considering housing.'],
  Other:['The district code gives planners a starting point for checking the applicable use table.','Specific plans, overlays and parcel-level constraints may control the proposal. Confirm the exact provision.']
 };
-function contains(g,point){
+export function contains(g,point){
   if(!point)return false;
   const [x,y]=point;
   function ring(coords){let inside=false;for(let i=0,j=coords.length-1;i<coords.length;j=i++){
