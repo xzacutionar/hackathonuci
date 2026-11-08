@@ -1,3 +1,4 @@
+import {contains} from './zoning.js';
 import {amenityIcon} from './amenity-icons.js';
 import {createLiberty} from './street-style.js';
 const usgsTiles='https://basemap.nationalmap.gov/arcgis/rest/services/USGSImageryOnly/MapServer/tile/{z}/{y}/{x}';
@@ -58,14 +59,46 @@ export function createRaster(container,D,callbacks){
     layer.on('mousemove',e=>{if(e.originalEvent)callbacks.tip(e.originalEvent,s);});
     layer.on('mouseout',callbacks.hideTip);
   }
+  // Canvas layers for listings and zoning can sit above the city polygons.
+  // Resolve the actual map coordinate so the whole painted city is clickable.
+  let hoveredArea=null;
+  const cityPaths=new Map();
+  function areaAt(event){
+    if(event.target.closest('.leaflet-marker-icon,.leaflet-popup,.leaflet-control,.leaflet-tooltip'))return null;
+    const ll=map.mouseEventToLatLng(event),point=[ll.lng,ll.lat];
+    const parcel=imports.find(s=>s.geometry&&contains(s.geometry,point));
+    if(parcel)return parcel;
+    if(!settings.regions)return null;
+    const region=D.regions.find(s=>s.geometry&&contains(s.geometry,point));
+    return region&&region!==selected?region:null;
+  }
+  function highlight(area){
+    if(area===hoveredArea)return;
+    if(hoveredArea)cityPaths.get(hoveredArea)?.setStyle({weight:1.8,color:'#785399',fillOpacity:.5});
+    hoveredArea=area;
+    if(area)cityPaths.get(area)?.setStyle({weight:3.2,color:'#512d79',fillOpacity:.65});
+    container.style.cursor=area?'pointer':'';
+    if(!area)callbacks.hideTip();
+  }
+  container.addEventListener('mousemove',event=>{
+    const area=event.buttons?null:areaAt(event);
+    highlight(area);
+    if(area)callbacks.tip(event,{name:area.name,boundary:area.kind==='region'?'Click to explore this region':area.boundary});
+  });
+  container.addEventListener('mouseleave',()=>highlight(null));
+  container.addEventListener('click',event=>{
+    if(map.dragging?.moved()||map.boxZoom?.moved())return;
+    const area=areaAt(event);if(!area)return;
+    event.stopImmediatePropagation();highlight(null);callbacks.hideTip();callbacks.pick(area);
+  },true);
   function draw(){
-    boundaries.clearLayers();markers.clearLayers();nearby.clearLayers();
+    highlight(null);cityPaths.clear();boundaries.clearLayers();markers.clearLayers();nearby.clearLayers();
     for(const s of [...D.regions,...imports,...(selected?.kind==='place'?[selected]:[])]){
       const active=selected?.id===s.id;
       if(s.geometry&&(s.kind==='parcel'||settings.regions)){
         L.geoJSON(s.geometry,{interactive:false,style:{color:'#55515b',weight:active?5:3.8,opacity:.8,fill:false,smoothFactor:.7}}).addTo(boundaries);
         const l=L.geoJSON(s.geometry,{style:{color:active?'#552d7e':'#785399',weight:active?2.8:1.8,dashArray:'5 4',opacity:1,fillColor:s.color,fillOpacity:active&&s.kind==='region'?0:.5,smoothFactor:.7}}).addTo(boundaries);
-        bindPick(l,s);l.on('mouseover',()=>l.setStyle({weight:3,color:'#512d79'}));l.on('mouseout',()=>l.setStyle({weight:active?2.8:1.8,color:active?'#552d7e':'#785399'}));
+        cityPaths.set(s,l);bindPick(l,s);l.on('mouseover',()=>l.setStyle({weight:3,color:'#512d79'}));l.on('mouseout',()=>l.setStyle({weight:active?2.8:1.8,color:active?'#552d7e':'#785399'}));
       }
       if(settings.labels||active){
         const marker=L.marker([s.lat,s.lon],{title:s.name,alt:s.name,keyboard:true,zIndexOffset:active?500:1,icon:L.divIcon({className:'map-label'+(active?' is-current':''),html:'<span class="place-label">'+escape(s.name)+'</span>',iconSize:[1,1],iconAnchor:[0,-1]})}).addTo(markers);
