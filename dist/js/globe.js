@@ -33,14 +33,32 @@ export function createGlobe(container,D,callbacks){
     if(rotating||event.buttons||container.hidden){clearHover();return;}
     const C=engine,scene=viewer.scene,box=scene.canvas.getBoundingClientRect();
     const pixel=new C.Cartesian2(event.clientX-box.left,event.clientY-box.top);
-    const ray=viewer.camera.getPickRay(pixel);
-    const point=(scene.pickPositionSupported&&scene.pickPosition(pixel))||(ray&&scene.globe.pick(ray,scene));
+    const point=groundCoordinates(pixel);
     if(!point){clearHover();return;}
-    const ll=C.Cartographic.fromCartesian(point);
-    const record=await zoneAt([C.Math.toDegrees(ll.longitude),C.Math.toDegrees(ll.latitude)]);
+    const record=await zoneAt(point);
     if(seq!==hoverSequence)return;
     outline(record);
     if(record)callbacks.tip(event,record);else callbacks.hideTip();
+  }
+  function groundCoordinates(pixel){
+    const scene=viewer.scene,ray=viewer.camera.getPickRay(pixel);
+    const at=(scene.pickPositionSupported&&scene.pickPosition(pixel))||(ray&&scene.globe.pick(ray,scene));
+    if(!at)return null;
+    const ll=engine.Cartographic.fromCartesian(at);
+    return [engine.Math.toDegrees(ll.longitude),engine.Math.toDegrees(ll.latitude)];
+  }
+  let clickSequence=0;
+  async function selectGround(pixel){
+    const seq=++clickSequence;
+    const sid=viewer.scene.pick(pixel)?.id?.properties?.sid?.getValue();
+    const marker=sid&&table.find(s=>s.id===sid);
+    if(marker&&marker.kind!=='region'){callbacks.pick(marker);return;}
+    const point=groundCoordinates(pixel);
+    if(!point)return;
+    const record=await zoneAt(point);
+    if(seq!==clickSequence||container.hidden||rotating)return;
+    if(record)callbacks.district(record.city||record,point);
+    else callbacks.notice('No mapped study district at this location.');
   }
   function library(){
     if(window.Cesium)return Promise.resolve(window.Cesium);
@@ -74,7 +92,7 @@ export function createGlobe(container,D,callbacks){
       viewer.imageryLayers.addImageryProvider(tiling);
       applyTerrain(publicToken);
       const handler=new C.ScreenSpaceEventHandler(viewer.scene.canvas);
-      handler.setInputAction(m=>{const id=viewer.scene.pick(m.position)?.id?.properties?.sid?.getValue();if(id)callbacks.pick(table.find(x=>x.id===id));},C.ScreenSpaceEventType.LEFT_CLICK);
+      handler.setInputAction(m=>selectGround(m.position),C.ScreenSpaceEventType.LEFT_CLICK);
       viewer.scene.canvas.addEventListener('pointermove',hover);
       viewer.scene.canvas.addEventListener('pointerleave',clearHover);
       viewer.scene.canvas.addEventListener('pointerdown',clearHover);
@@ -136,7 +154,7 @@ export function createGlobe(container,D,callbacks){
     for(const a of places.filter(x=>Number.isFinite(x.lon)))viewer.entities.add({position:C.Cartesian3.fromDegrees(a.lon,a.lat),name:a.name+' · '+a.cat,billboard:{image:amenityIcon(a.cat),width:28,height:28,disableDepthTestDistance:Number.POSITIVE_INFINITY}});
     viewer.scene.requestRender();
   }
-  function stop(){rotating=false;cancelAnimationFrame(raf);if(viewer){viewer.camera.lookAtTransform(engine.Matrix4.IDENTITY);viewer.camera.cancelFlight();viewer.scene.requestRender();}}
+  function stop(){clickSequence++;rotating=false;cancelAnimationFrame(raf);if(viewer){viewer.camera.lookAtTransform(engine.Matrix4.IDENTITY);viewer.camera.cancelFlight();viewer.scene.requestRender();}}
   function orbit(s){
     if(!viewer||!s)return;stop();const C=engine;rotating=true;angle=viewer.camera.heading;orbitCenter=C.Cartesian3.fromDegrees(s.lon,s.lat);let last;
     function step(ts){if(!rotating)return;if(last)angle+=Math.min(65,ts-last)*.000065;last=ts;viewer.camera.lookAt(orbitCenter,new C.HeadingPitchRange(angle,-.63,range));viewer.scene.requestRender();raf=requestAnimationFrame(step);}raf=requestAnimationFrame(step);
