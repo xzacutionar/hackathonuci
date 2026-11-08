@@ -32,6 +32,30 @@ function contains(g,point){
   }return inside;}
   return (g.type==='MultiPolygon'?g.coordinates:[g.coordinates]).some(p=>ring(p[0])&&!p.slice(1).some(ring));
 }
+function cityZones(key){
+ if(!cache.has(key))cache.set(key,fetchJson('zones-'+key+'.json').catch(error=>{cache.delete(key);throw error;}));
+ return cache.get(key);
+}
+// Build bounds once per city so pointer movement only tests nearby polygons.
+export function createZoneLookup(model){
+ const indexed=new WeakMap();
+ return async point=>{
+   const city=model.regions.find(r=>r.geometry&&contains(r.geometry,point));
+   if(!city)return null;
+   let fc;
+   try{fc=await cityZones(city.id);}catch{return city;}
+   if(!indexed.has(fc)){
+     indexed.set(fc,fc.features.map(f=>{
+       const [w,s,e,n]=model.bbox(f.geometry);
+       const category=family(f.properties.name);
+       return {w,s,e,n,area:(e-w)*(n-s),record:{geometry:f.geometry,name:category,color:colors[category],boundary:[f.properties.code,f.properties.name].filter(Boolean).join(' · ')}};
+     }).sort((a,b)=>a.area-b.area));
+   }
+   const [x,y]=point;
+   const hit=indexed.get(fc).find(v=>x>=v.w&&x<=v.e&&y>=v.s&&y<=v.n&&contains(v.record.geometry,point));
+   return hit?.record||city;
+ };
+}
 export function zoningInspector(map,onPoint){
  const pane=map.createPane('zoning');pane.style.zIndex='435';
  const renderer=L.canvas({pane:'zoning',padding:.3}),layer=L.layerGroup().addTo(map);
@@ -84,13 +108,12 @@ export function zoningInspector(map,onPoint){
    const id=++sequence;city=s?.kind==='region'?s:null;focus=null;highlight=null;data=null;failed=false;layer.clearLayers();render();
    if(!city)return;
    const key=city.id;
-   if(!cache.has(key))cache.set(key,fetchJson('zones-'+key+'.json'));
-   cache.get(key).then(fc=>{
+   cityZones(key).then(fc=>{
      if(id!==sequence)return;data=fc;
      L.geoJSON(fc,{renderer,pane:'zoning',style:f=>({color:'#63576a',weight:1,fillOpacity:.5,fillColor:colors[family(f.properties.name)]}),onEachFeature:(f,path)=>{
        path.on('click',e=>{L.DomEvent.stopPropagation(e.originalEvent);selectFeature(f,path,e.latlng);});
      }}).addTo(layer);render();
-   }).catch(()=>{cache.delete(key);if(id===sequence){failed=true;render();}});
+   }).catch(()=>{if(id===sequence){failed=true;render();}});
  }
  function render(){
    const box=document.querySelector('#zone-panel');if(!box||!city)return;
