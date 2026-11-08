@@ -113,6 +113,15 @@ export function mountLandscout(D,icons,atlasFactory,globeFactory){
     }catch(e){if(seq!==cameraSeq)return;photoFallback(wanted);}
     finally{clearTimeout(timed);}
   }
+  function inspectDistrict(city,point){
+    if(mode==='2D')return;
+    property=null;selected=city;zoneOrigin={lon:point[0],lat:point[1]};
+    nearSeq++;near=[];nearState='idle';
+    atlas.setSelection(city);atlas.setAmenities([]);photo.setAmenities([]);
+    globe.setRecords(allRecords(),city,[]);modes('3D');panel();
+    zones.selectCity(city,point);
+    $('panel').scrollTop=0;
+  }
   function choose(s){if(!s)return;if(s.kind==='listing')return;property=null;zoneOrigin=null;selected=s;near=[];nearState='idle';nearSeq++;hideTip();closeSearch();photo.setAmenities([]);atlas.setAmenities([]);atlas.setSelection(s);if(mode!=='2D')flat();zones.selectCity(s);atlas.fly(s);panel();$('panel').scrollTop=0;if(s.kind==='region'){lookup();}else perspective();}
   function reset(){property=null;zoneOrigin=null;zones.selectCity(null);flat();selected=null;near=[];nearState='idle';nearSeq++;closeSearch();$('toast').hidden=true;atlas.setSelection(null);photo.setAmenities([]);atlas.setAmenities([]);atlas.home();panel();$('panel').scrollTop=0;}
   async function lookup(){const target=selected;if(!target)return;const seq=++nearSeq;nearState='loading';panel();
@@ -133,7 +142,7 @@ export function mountLandscout(D,icons,atlasFactory,globeFactory){
     if(q.length<3)return;
     searchTimer=setTimeout(async()=>{try{const remote=await D.photon(q);if(seq!==searchSeq)return;const rows=[...local,...remote.filter(x=>!local.some(r=>r.name.toLowerCase()===x.name.toLowerCase()))].slice(0,8);results(rows,rows.length?'':'No places found in the Orange County search area.');}catch{if(seq===searchSeq)results(local,'Address service unavailable. Local study regions remain searchable.');}},330);
   }
-  const callbacks={imagery:label=>{if(mode!=='2D'&&!photo.active)$('legendNote').textContent=label;},pick:choose,tip,hideTip,notice,scale,manual:()=>{globe.stop();modes('3D');},failure:()=>photoFallback(mode==='Orbit'?'Orbit':'3D'),basemapChanged:()=>updateCredit()};
+  const callbacks={district:inspectDistrict,imagery:label=>{if(mode!=='2D'&&!photo.active)$('legendNote').textContent=label;},pick:choose,tip,hideTip,notice,scale,manual:()=>{globe.stop();modes('3D');},failure:()=>photoFallback(mode==='Orbit'?'Orbit':'3D'),basemapChanged:()=>updateCredit()};
   atlas=atlasFactory($('raster-map'),D,callbacks);globe=globeFactory($('globe'),D,callbacks);globe.setRecords(allRecords(),null,[]);offers=opportunities(atlas.map,D.regions,selectProperty,perspective);zones=zoningInspector(atlas.map,point=>{zoneOrigin={lon:point.lng,lat:point.lat};lookup();});
   $('brand').onclick=reset;$('home').onclick=reset;$('two').onclick=flat;$('three').onclick=()=>perspective();$('orbit').onclick=()=>perspective('Orbit');
   $('north').onclick=()=>{if(mode==='2D')notice('North is up in the county atlas.',2000);else if(photo.active){photo.north();modes('3D');}else perspective();};
