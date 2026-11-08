@@ -1,3 +1,4 @@
+import {createZoneLookup} from './zoning.js';
 import {amenityIcon} from './amenity-icons.js';
 export function createGlobe(container,D,callbacks){
   const cdn='/vendor/cesium/';let viewer=null,engine=null,loading=null,tiling=null,table=[],picked=null,places=[],rotating=false,raf=0,angle=0,orbitCenter,range=5000;
@@ -11,6 +12,35 @@ export function createGlobe(container,D,callbacks){
     if(!response.ok)throw Error('Photorealistic tiles unavailable');
     const asset=await response.json();
     return new C.Resource({url:asset.url,credits:asset.attributions.map(a=>new C.Credit(a.html,true))});
+  }
+  const zoneAt=createZoneLookup(D);
+  let hovered=null,edges=[],hoverSequence=0;
+  function outline(record){
+    if(record===hovered)return;
+    for(const entity of edges)viewer.entities.remove(entity);
+    edges=[];hovered=record;
+    if(record)for(const polygon of D.polygons(record.geometry))for(const ring of polygon){
+      edges.push(viewer.entities.add({polyline:{
+        positions:engine.Cartesian3.fromDegreesArray(ring.flatMap(p=>p.slice(0,2))),
+        width:3,clampToGround:true,material:engine.Color.fromCssColorString(record.color).withAlpha(.75)
+      }}));
+    }
+    viewer?.scene.requestRender();
+  }
+  function clearHover(){hoverSequence++;outline(null);callbacks.hideTip();}
+  async function hover(event){
+    const seq=++hoverSequence;
+    if(rotating||event.buttons||container.hidden){clearHover();return;}
+    const C=engine,scene=viewer.scene,box=scene.canvas.getBoundingClientRect();
+    const pixel=new C.Cartesian2(event.clientX-box.left,event.clientY-box.top);
+    const ray=viewer.camera.getPickRay(pixel);
+    const point=(scene.pickPositionSupported&&scene.pickPosition(pixel))||(ray&&scene.globe.pick(ray,scene));
+    if(!point){clearHover();return;}
+    const ll=C.Cartographic.fromCartesian(point);
+    const record=await zoneAt([C.Math.toDegrees(ll.longitude),C.Math.toDegrees(ll.latitude)]);
+    if(seq!==hoverSequence)return;
+    outline(record);
+    if(record)callbacks.tip(event,record);else callbacks.hideTip();
   }
   function library(){
     if(window.Cesium)return Promise.resolve(window.Cesium);
@@ -45,7 +75,10 @@ export function createGlobe(container,D,callbacks){
       applyTerrain(publicToken);
       const handler=new C.ScreenSpaceEventHandler(viewer.scene.canvas);
       handler.setInputAction(m=>{const id=viewer.scene.pick(m.position)?.id?.properties?.sid?.getValue();if(id)callbacks.pick(table.find(x=>x.id===id));},C.ScreenSpaceEventType.LEFT_CLICK);
-      handler.setInputAction(m=>{const id=viewer.scene.pick(m.endPosition)?.id?.properties?.sid?.getValue(),rec=table.find(x=>x.id===id);if(rec){const b=container.getBoundingClientRect();callbacks.tip({clientX:b.left+m.endPosition.x,clientY:b.top+m.endPosition.y},rec);}else callbacks.hideTip();},C.ScreenSpaceEventType.MOUSE_MOVE);
+      viewer.scene.canvas.addEventListener('pointermove',hover);
+      viewer.scene.canvas.addEventListener('pointerleave',clearHover);
+      viewer.scene.canvas.addEventListener('pointerdown',clearHover);
+      viewer.camera.moveStart.addEventListener(clearHover);
       viewer.scene.renderError.addEventListener(()=>callbacks.failure('3D rendering stopped. The 2D atlas is available.'));
       viewer.screenSpaceEventHandler.removeInputAction(C.ScreenSpaceEventType.LEFT_DOUBLE_CLICK);
       viewer.scene.canvas.addEventListener('pointerdown',()=>{if(rotating)callbacks.manual();});refresh();return viewer;
@@ -80,7 +113,7 @@ export function createGlobe(container,D,callbacks){
     }
   }
   function refresh(){
-    if(!viewer)return;const C=engine;viewer.entities.removeAll();
+    if(!viewer)return;const C=engine;clearHover();viewer.entities.removeAll();
     for(const s of table){
       const chosen=s.id===picked?.id;
       if(s.geometry&&s.kind==='parcel'){
@@ -114,5 +147,5 @@ export function createGlobe(container,D,callbacks){
     const at=s||{lon:-117.80,lat:33.70};const sphere=new C.BoundingSphere(C.Cartesian3.fromDegrees(at.lon,at.lat),1);
     viewer.camera.flyToBoundingSphere(sphere,{duration:matchMedia('(prefers-reduced-motion: reduce)').matches?0:1.45,offset:new C.HeadingPitchRange(0,s?-.64:-1.29,range),complete:after});viewer.scene.requestRender();
   }
-  return {init,fly,stop,orbit,applyTerrain,setLabels(visible){labelVisible=visible;refresh();},setRecords(rows,s,near){table=rows;picked=s;places=near;refresh();},zoomBy(delta){if(!viewer)return;if(rotating){range=Math.max(180,Math.min(120000,range*(delta>0?.65:1.5)));return;}const magnitude=viewer.camera.positionCartographic.height*.38;delta>0?viewer.camera.zoomIn(magnitude):viewer.camera.zoomOut(magnitude);viewer.scene.requestRender();},resize(){viewer?.resize();viewer?.scene.requestRender();},get imageryStatus(){return imageryStatus;},get active(){return !!viewer;}};
+  return {init,fly,stop,orbit,clearHover,applyTerrain,setLabels(visible){labelVisible=visible;refresh();},setRecords(rows,s,near){table=rows;picked=s;places=near;refresh();},zoomBy(delta){if(!viewer)return;if(rotating){range=Math.max(180,Math.min(120000,range*(delta>0?.65:1.5)));return;}const magnitude=viewer.camera.positionCartographic.height*.38;delta>0?viewer.camera.zoomIn(magnitude):viewer.camera.zoomOut(magnitude);viewer.scene.requestRender();},resize(){viewer?.resize();viewer?.scene.requestRender();},get imageryStatus(){return imageryStatus;},get active(){return !!viewer;}};
 }
