@@ -1,3 +1,4 @@
+import {inspectListing,yieldLabel} from './site-review.js';
 import {opportunities} from './opportunities.js';
 import {amenityIcon} from './amenity-icons.js';
 import {zoningInspector} from './zoning.js';
@@ -14,7 +15,7 @@ export function mountLandscout(D,icons,atlasFactory,globeFactory){
   const cameraTarget=()=>property||selected;
   function selectProperty(row){
     if(mode!=='2D')flat();
-    property={id:row.listing_id,kind:'listing',name:row.property_name,lat:Number(row.latitude),lon:Number(row.longitude),geometry:row.geometry,color:'#08764b',viewRange:650};
+    property={row,id:row.listing_id,kind:'listing',name:row.property_name,lat:Number(row.latitude),lon:Number(row.longitude),geometry:row.geometry,color:'#08764b',viewRange:650};
     modes('2D');
   }
   const allRecords=()=>[...D.regions,...imports,...(property?[property]:[]),...(selected?.kind==='place'?[selected]:[])];
@@ -43,13 +44,21 @@ export function mountLandscout(D,icons,atlasFactory,globeFactory){
   }
   function panel(){
     const el=$('panel');
+    if(property&&mode!=='2D'){
+      const r=property.row;
+      const facts=[['Asking price',r.asking_price==='Not listed'?'Undisclosed':r.asking_price],['Property type',r.property_type],['Gross floor area',Number(r.building_sf)>0?Number(r.building_sf).toLocaleString()+' sq ft':null],['Parcel acres',r.parcel_acres],['Workbook zoning',[r.zoning_code,r.zoning_description].filter(Boolean).join(' · ')],['Conversion estimate',yieldLabel(r)]];
+      el.innerHTML='<header class="sideHead"><button class="back" id="back">'+icon('left')+'Back to '+esc(selected?.name||'county overview')+'</button><div class="eyebrow">'+icon('pin')+'Commercial property</div><h1>'+esc(r.property_name)+'</h1><p class="sub">'+esc(r.address)+'</p></header><section class="block"><h2>Property details</h2><dl class="info">'+facts.filter(x=>x[1]!=null&&x[1]!=='').map(x=>info(...x)).join('')+'</dl><div class="btnrow">'+btn('reviewProperty','Photos and district laws','layers')+'</div></section>';
+      $('back').onclick=()=>{atlas.map.closePopup();if(selected)choose(selected);else reset();};
+      $('reviewProperty').onclick=()=>inspectListing(r,'laws',perspective);
+      return;
+    }
     if(!selected){
       el.innerHTML='<header class="sideHead"><div class="eyebrow">'+icon('layers')+'County overview</div><h1>Orange County</h1><p class="sub">California, United States</p></header><section class="block"><div class="blockHead"><h2>Study regions</h2><span class="count">6 regions</span></div><p class="empty">Select a city to explore its zoning districts.</p>'+D.regions.map(listRow).join('')+'</section>'+fileSection()+'<section class="block"><h2>Boundary source</h2><p class="boxNote">'+(official?'City limits are sourced from the California Department of Technology. Parcel boundaries can be imported separately.':'Study locations are shown as pins while city limits are unavailable.')+'</p></section>';
     }else{
       const s=selected,imported=s.kind==='parcel',landInfo=imported?[
         ['Parcel ID',s.parcelId||'Not supplied'],['Land size',s.area!=null?s.area.toLocaleString()+' ac · file value':'Unverified'],['Zoning','Unverified'],['Ownership','Unverified'],['Constraints','Unassessed']
       ]:[['Parcel ID','No parcel selected'],['Land size','Unverified'],['Zoning',s.kind==='region'?'Select a district above':'Unverified'],['Ownership','Unverified'],['Constraints','Unassessed']];
-      el.innerHTML='<header class="sideHead"><button class="back" id="back">'+icon('left')+'County overview</button><div class="eyebrow">'+icon('pin')+(imported?'Imported site':s.kind==='place'?'Search result':'Study region')+'</div><h1>'+esc(s.name)+'</h1><p class="sub coords">'+coords(s)+'</p><span class="badge"><i></i>'+esc(s.boundary)+'</span></header><section class="block"><div class="blockHead"><h2>Land information</h2></div><dl class="info">'+landInfo.map(x=>info(...x)).join('')+'</dl>'+(imported?'<p class="empty">File attributes are unverified.'+(s.source?' Source supplied: '+esc(s.source):'')+'</p>':'')+'</section>'+nearbySection()+'<section class="block"><details><summary>Development visualisation</summary><p class="empty">Conceptual models, footprint and density estimates can be attached to a reviewed parcel in a future version. Approval status has not been assessed.</p></details></section><section class="block"><details><summary>Selection data</summary><div class="btnrow">'+btn('saveSelection','Save selection record','download')+btn('import','Import GeoJSON','upload')+'</div></details></section>';
+      el.innerHTML='<header class="sideHead"><button class="back" id="back">'+icon('left')+'Back to county overview</button><div class="eyebrow">'+icon('pin')+(imported?'Imported site':s.kind==='place'?'Search result':'Study region')+'</div><h1>'+esc(s.name)+'</h1><p class="sub coords">'+coords(s)+'</p><span class="badge"><i></i>'+esc(s.boundary)+'</span></header><section class="block"><div class="blockHead"><h2>Land information</h2></div><dl class="info">'+landInfo.map(x=>info(...x)).join('')+'</dl>'+(imported?'<p class="empty">File attributes are unverified.'+(s.source?' Source supplied: '+esc(s.source):'')+'</p>':'')+'</section>'+nearbySection()+'<section class="block"><details><summary>Development visualisation</summary><p class="empty">Conceptual models, footprint and density estimates can be attached to a reviewed parcel in a future version. Approval status has not been assessed.</p></details></section><section class="block"><details><summary>Selection data</summary><div class="btnrow">'+btn('saveSelection','Save selection record','download')+btn('import','Import GeoJSON','upload')+'</div></details></section>';
     }
     el.querySelector('.sideHead').insertAdjacentHTML('afterend','<section id="opportunity-list" class="block listings"></section>');
     offers?.render(selected,mode);
@@ -69,7 +78,7 @@ export function mountLandscout(D,icons,atlasFactory,globeFactory){
     $('scale').hidden=mode!=='2D';
     for(const [k,active] of [['aerial',!street],['streets',street]])$(k).setAttribute('aria-pressed',String(active));
   }
-  function modes(next){mode=next;$('legendTitle').textContent=(mode!=='2D'&&property?property:selected)?.name||'Orange County';$('orbit').textContent=next==='Orbit'?'Stop orbit':property?'Orbit property':'Orbit';offers?.mode(selected,mode);for(const [id,m] of [['two','2D'],['three','3D'],['orbit','Orbit']])$(id).setAttribute('aria-pressed',String(m===next));updateCredit();}
+  function modes(next){const refreshPanel=(mode==='2D')!==(next==='2D');mode=next;globe?.clearHover();if(refreshPanel&&property){panel();$('panel').scrollTop=0;}$('legendTitle').textContent=(mode!=='2D'&&property?property:selected)?.name||'Orange County';$('orbit').textContent=next==='Orbit'?'Stop orbit':property?'Orbit property':'Orbit';offers?.mode(selected,mode);for(const [id,m] of [['two','2D'],['three','3D'],['orbit','Orbit']])$(id).setAttribute('aria-pressed',String(m===next));updateCredit();}
   function flat(){
     ++cameraSeq;photo.close();globe?.stop();$('globe').hidden=true;$('atlas').hidden=false;hideTip();modes('2D');atlas.resize();
     $('legendNote').textContent=selected?selected.boundary:'6 study regions';
