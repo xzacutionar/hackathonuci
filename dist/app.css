@@ -59,3 +59,5 @@ html,body{background:#f7f8f6}.top{height:67px;padding:0 25px;gap:18px}.brand{fon
 #guide-next{border:0;background:#174c36;color:#fff;padding:10px 15px}
 @media(max-width:660px){.guide-open{padding:8px;font-size:13px}.guide-top,.guide-footer{padding:12px 15px}.guide-body{padding:16px}.guide-footer{flex-wrap:wrap}#guide-steps button{width:19px}}
 @media(prefers-reduced-motion:reduce){#welcome-guide[open]{animation:none}}
+
+.guide-media video[hidden]{display:none}.guide-orbit-frame{position:absolute;inset:0;width:100%;height:100%;border:0;background:#183a2d}
