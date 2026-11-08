@@ -48,7 +48,7 @@ export function createZoneLookup(model){
      indexed.set(fc,fc.features.map(f=>{
        const [w,s,e,n]=model.bbox(f.geometry);
        const category=family(f.properties.name);
-       return {w,s,e,n,area:(e-w)*(n-s),record:{geometry:f.geometry,name:category,color:colors[category],boundary:[f.properties.code,f.properties.name].filter(Boolean).join(' · ')}};
+       return {w,s,e,n,area:(e-w)*(n-s),record:{city,geometry:f.geometry,name:category,color:colors[category],boundary:[f.properties.code,f.properties.name].filter(Boolean).join(' · ')}};
      }).sort((a,b)=>a.area-b.area));
    }
    const [x,y]=point;
@@ -103,7 +103,15 @@ export function zoningInspector(map,onPoint){
    const ll=map.mouseEventToLatLng(event),picked=districtAt(ll);
    if(picked){event.stopPropagation();clearHover();selectFeature(picked.feature,picked,ll);}
  },true);
- function selectCity(s){
+ function selectCity(s,point){
+   function inspectPoint(){
+     if(!point)return;
+     const ll=L.latLng(point[1],point[0]),path=districtAt(ll);
+     if(path)selectFeature(path.feature,path,ll);
+     else {if(highlight)highlight.setStyle({weight:1,color:'#63576a'});focus=null;highlight=null;overlaps=[];render();}
+   }
+   if(point&&s===city&&data){inspectPoint();return;}
+
    clearHover();
    const id=++sequence;city=s?.kind==='region'?s:null;focus=null;highlight=null;data=null;failed=false;layer.clearLayers();render();
    if(!city)return;
@@ -112,7 +120,7 @@ export function zoningInspector(map,onPoint){
      if(id!==sequence)return;data=fc;
      L.geoJSON(fc,{renderer,pane:'zoning',style:f=>({color:'#63576a',weight:1,fillOpacity:.5,fillColor:colors[family(f.properties.name)]}),onEachFeature:(f,path)=>{
        path.on('click',e=>{L.DomEvent.stopPropagation(e.originalEvent);selectFeature(f,path,e.latlng);});
-     }}).addTo(layer);render();
+     }}).addTo(layer);render();inspectPoint();
    }).catch(()=>{if(id===sequence){failed=true;render();}});
  }
  function render(){
