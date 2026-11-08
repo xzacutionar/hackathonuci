@@ -63,8 +63,6 @@ export function mountLandscout(D,icons,atlasFactory,globeFactory){
     el.querySelector('.sideHead').insertAdjacentHTML('afterend','<section id="opportunity-list" class="block listings"></section>');
     offers?.render(selected,mode);
     if(selected?.kind==='region'){const first=el.querySelector('.sideHead');first.insertAdjacentHTML('afterend','<section id="zone-panel" class="block zpanel"></section>');zones?.render();}
-    const research='<section class="block zpanel"><h2>Research workbook</h2><div class="zlinks"><a target="_blank" rel="noopener" href="https://docs.google.com/spreadsheets/d/17NlGpn94b18pJvoRaVuTfZPA_nZlxd4IETw1rf1kFxY/edit#gid=1587836229">Legal pathways ↗</a><a target="_blank" rel="noopener" href="https://docs.google.com/spreadsheets/d/17NlGpn94b18pJvoRaVuTfZPA_nZlxd4IETw1rf1kFxY/edit#gid=1670023345">Parcel geometries ↗</a><a target="_blank" rel="noopener" href="https://docs.google.com/spreadsheets/d/17NlGpn94b18pJvoRaVuTfZPA_nZlxd4IETw1rf1kFxY/edit#gid=141901">Parcel checks ↗</a><a target="_blank" rel="noopener" href="https://docs.google.com/spreadsheets/d/17NlGpn94b18pJvoRaVuTfZPA_nZlxd4IETw1rf1kFxY/edit#gid=560422622">Conversion candidates ↗</a></div></section>';
-    el.insertAdjacentHTML('beforeend',research);
     el.querySelectorAll('[data-rec]').forEach(b=>b.addEventListener('click',()=>choose(allRecords().find(s=>s.id===b.dataset.rec))));
     if($('back'))$('back').onclick=reset;if($('import'))$('import').onclick=()=>$('file').click();if($('nearby'))$('nearby').onclick=lookup;if($('saveSelection'))$('saveSelection').onclick=saveRecord;
     $('legendTitle').textContent=(mode!=='2D'&&property?property:selected)?.name||'Orange County';

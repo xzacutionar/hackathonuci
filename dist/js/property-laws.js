@@ -1,6 +1,5 @@
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const link=(url,label)=>/^https:\/\//.test(url||'')?'<a href="'+esc(url)+'" target="_blank" rel="noopener">'+esc(label)+' ↗</a>':'';
-const workbook='https://docs.google.com/spreadsheets/d/17NlGpn94b18pJvoRaVuTfZPA_nZlxd4IETw1rf1kFxY/edit';
 const cityCodes={'Santa Ana':'SA','Anaheim':'ANA','Garden Grove':'GG','Tustin':'TUSTIN','Orange':'ORANGE','Westminster':'WESTMINSTER'};
 const normal=s=>String(s).toUpperCase().replace(/[^A-Z0-9]/g,'');
 let loaded;
@@ -63,8 +62,8 @@ export async function showPropertyLaws(el,r,compact=false){
     if(minor.length)html+='<p>Minor map intersections below 1% of the footprint: '+esc(minor.map(z=>z.code).join(', '))+'. Confirm the legal boundary before relying on these designations.</p>';
     html+='<h4>Housing pathways to check</h4><p>These are screening leads. Open a law for its conditions and official source.</p>'+routes.map(card).join('');
     if(/AB\s*507\s*N\/A/i.test(screen))html+='<p><b>Workbook exclusion flagged:</b> '+esc(screen.split('|').find(t=>/AB\s*507/i.test(t)))+'. Verify the operating history with the city.</p>';
-    html+='<div class="property-law-links">'+link(workbook+'#gid=560422622&range=L'+r.sheet_row+':R'+r.sheet_row,'Property’s workbook evidence')+' '+pending.map(p=>link(workbook+'#gid=1587836229&range=A'+p.row,p.name+' · '+p.status)).join(' ')+'</div>';
+    if(pending.length)html+='<p>'+pending.map(p=>esc(p.name+' · '+p.status)).join('<br>')+'</p>';
   }
   el.innerHTML=html;
- }catch{el.innerHTML='<h3>District laws for this property</h3><p>Law sources could not load. '+link(workbook+'#gid=560422622&range=L'+r.sheet_row+':R'+r.sheet_row,'Check this property’s research row')+'</p>';}
+ }catch{el.innerHTML='<h3>District laws for this property</h3><p>Law sources could not load. Reopen the property to retry.</p>';}
 }

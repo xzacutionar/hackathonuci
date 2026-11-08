@@ -1,6 +1,4 @@
 const escape=v=>String(v??'').replace(/[&<>"']/g,k=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[k]));
-const sheet='https://docs.google.com/spreadsheets/d/17NlGpn94b18pJvoRaVuTfZPA_nZlxd4IETw1rf1kFxY/edit';
-const url=(tab,row)=>sheet+'#gid='+tab+(row?'&range=A'+row:'');
 const link=(href,label)=>/^https:\/\//.test(href||'')?'<a target="_blank" rel="noopener" href="'+escape(href)+'">'+escape(label)+' ↗</a>':'';
 const fetchJson=async p=>{const r=await fetch('/data/'+p);if(!r.ok)throw Error('Unavailable');return r.json();};
 const catalogue=Promise.all([fetchJson('research-index.json'),fetchJson('research-rows.json'),fetchJson('zoning-law.json').catch(()=>({})),fetchJson('research-points.json').catch(()=>({pts:{},checks:[]}))]);
@@ -126,9 +124,8 @@ export function zoningInspector(map,onPoint){
  function render(){
    const box=document.querySelector('#zone-panel');if(!box||!city)return;
    const laws=refs?.[2]?.cities?.[city.id]||{};
-   const tabs=refs?.[0]?.tabs||{};
    const base='<h2>Zoning districts</h2>';
-   const sources='<div class="zlinks">'+link(data?.source,'Zoning map source')+link(data?.ordinance||laws.url,'City zoning ordinance')+link(url(tabs['Legal Pathways']||1587836229),'Legal Pathways sheet')+'</div>';
+   const sources='<div class="zlinks">'+link(data?.source,'Zoning map source')+link(data?.ordinance||laws.url,'City zoning ordinance')+'</div>';
    const vintage=city.id==='CM'?'Historical zoning: SCAG’s map book uses Costa Mesa local zoning dated 27 September 2017. Confirm the current classification with the city before relying on it.':(data?.vintage||'');
    let body=failed?'<p>District geometry is unavailable for this city.</p>':!data?'<p>Loading city zoning…</p>':'<p>Hover over a coloured zone to see its category. Select it to inspect the district.</p>';
    if(data){
@@ -141,15 +138,15 @@ export function zoningInspector(map,onPoint){
      body+='<h3>'+escape(code)+' · '+escape(name)+'</h3><p class="boxNote">'+(rule?'District-specific ordinance screening':'General screening for this land-use type. The local use table still needs review.')+'</p><strong>Potential advantage</strong><p>'+escape(assessment[0])+'</p><strong>Constraint to check</strong><p>'+escape(assessment[1])+'</p>'+link(rule?.url||laws.url,'Check the district rules');
      if(overlaps.length)body+='<p>Other designations mapped at this point: '+escape([...new Set(overlaps.map(f=>f.properties.code+' · '+f.properties.name))].join(', '))+'. Check both provisions.</p>';
      const spatial=(refs?.[1]||[]).filter(r=>r.tab==='Parcel Geometries'&&contains(focus.geometry,refs?.[3]?.pts?.[r.id]));
-     body+='<details><summary>Parcel research points inside this section ('+spatial.length+')</summary><p>Sample of workbook rows 2–1000, located by their recorded points. Open the sheet for the complete inventory.</p>'+spatial.slice(0,8).map(r=>{
+     body+='<details><summary>Parcel research points inside this section ('+spatial.length+')</summary><p>Sample of workbook rows 2–1000, located by their recorded points.</p>'+spatial.slice(0,8).map(r=>{
        const checks=(refs?.[3]?.checks||[]).filter(c=>String(c.id)===String(r.id)).slice(0,3);
-       return link(url(tabs[r.tab],r.row),r.name||r.id)+' '+checks.map(c=>link(url(tabs['Parcel Checks'],c.row),c.law+' · '+c.status)).join(' ');
+       return escape(r.name||r.id)+' '+checks.map(c=>escape(c.law+' · '+c.status)).join(' ');
      }).join('<br>')+'</details>';
      const candidates=(refs?.[1]||[]).filter(r=>String(r.city).toLowerCase()===city.name.toLowerCase()&&String(r.code).trim().toLowerCase()===String(code).trim().toLowerCase());
-     body+='<details><summary>Other workbook matches by city and code ('+candidates.length+')</summary><p>Indexed sample from 7 November 2026. A matching code does not establish that a record lies inside this specific polygon.</p>'+candidates.slice(0,8).map(r=>link(url(tabs[r.tab],r.row),r.name||r.id)).join('<br>')+'</details>';
+     body+='<details><summary>Other workbook matches by city and code ('+candidates.length+')</summary><p>Indexed sample from 7 November 2026. A matching code does not establish that a record lies inside this specific polygon.</p>'+candidates.slice(0,8).map(r=>escape(r.name||r.id)).join('<br>')+'</details>';
      body+='<details><summary>Affordable-housing laws to screen</summary>';
      for(const pathway of (refs?.[2]?.pathways||[]).filter(p=>!p.title.startsWith('AB 2011')||['Commercial','Mixed use','Other'].includes(kind)))body+='<p><strong>'+escape(pathway.title)+'</strong><br>'+escape(pathway.benefit)+' '+escape(pathway.caution)+' '+link(pathway.url,'Official text')+'</p>';
-     body+='<p>Workbook leads below are pending review. Eligibility depends on the parcel, project and statutory conditions.</p>'+((refs?.[0]?.rows)||[]).filter(r=>['LAW-SB9','LAW-SB4','LAW-AB2011','LAW-SB684','LAW-SLA'].includes(r.id)).map(r=>link(url(tabs['Legal Pathways'],r.row),r.name+' · '+r.status)).join('<br>')+'</details>';
+     body+='<p>Workbook leads below are pending review. Eligibility depends on the parcel, project and statutory conditions.</p>'+((refs?.[0]?.rows)||[]).filter(r=>['LAW-SB9','LAW-SB4','LAW-AB2011','LAW-SB684','LAW-SLA'].includes(r.id)).map(r=>escape(r.name+' · '+r.status)).join('<br>')+'</details>';
    }
    box.innerHTML=base+(vintage?'<p class="boxNote">'+escape(vintage)+'</p>':'')+body+sources;
    const picker=box.querySelector('select');if(picker)picker.onchange=()=>{let first;for(const group of layer.getLayers())group.eachLayer(p=>{if(String(p.feature.properties.code)!==picker.value)return;if(!first||map.distance(map.getCenter(),p.getBounds().getCenter())<map.distance(map.getCenter(),first.getBounds().getCenter()))first=p;});if(first){selectFeature(first.feature,first);map.stop();map.fitBounds(first.getBounds(),{maxZoom:14.5,padding:[32,32],animate:false});}};
