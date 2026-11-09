@@ -1,6 +1,6 @@
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const link=(url,label)=>/^https:\/\//.test(url||'')?'<a href="'+esc(url)+'" target="_blank" rel="noopener">'+esc(label)+' ↗</a>':'';
-const cityCodes={'Santa Ana':'SA','Anaheim':'ANA','Garden Grove':'GG','Tustin':'TUSTIN','Orange':'ORANGE','Westminster':'WESTMINSTER'};
+const cityCodes={'Laguna Niguel':'LN','Irvine':'IRV','Santa Ana':'SA','Anaheim':'ANA','Garden Grove':'GG','Tustin':'TUSTIN','Orange':'ORANGE','Westminster':'WESTMINSTER'};
 const normal=s=>String(s).toUpperCase().replace(/[^A-Z0-9]/g,'');
 let loaded;
 function readData(){

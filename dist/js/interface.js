@@ -46,7 +46,7 @@ export function mountLandscout(D,icons,atlasFactory,globeFactory){
     const el=$('panel');
     if(property&&mode!=='2D'){
       const r=property.row;
-      const facts=[['Asking price',r.asking_price==='Not listed'?'Undisclosed':r.asking_price],['Property type',r.property_type],['Gross floor area',Number(r.building_sf)>0?Number(r.building_sf).toLocaleString()+' sq ft':null],['Parcel acres',r.parcel_acres],['Workbook zoning',[r.zoning_code,r.zoning_description].filter(Boolean).join(' · ')],['Conversion estimate',yieldLabel(r)]];
+      const facts=[['Asking price',r.asking_price==='Not listed'?'Undisclosed':r.asking_price],['Property type',r.property_type],['Gross floor area',Number(r.building_sf)>0?Number(r.building_sf).toLocaleString()+' sq ft':null],['Listing status',r.listing_status],['Parcel acres',r.parcel_acres],['Zoning',[r.zoning_code,r.zoning_description].filter(Boolean).join(' · ')],['Conversion estimate',yieldLabel(r)]];
       el.innerHTML='<header class="sideHead"><button class="back" id="back">'+icon('left')+'Back to '+esc(selected?.name||'county overview')+'</button><div class="eyebrow">'+icon('pin')+'Commercial property</div><h1>'+esc(r.property_name)+'</h1><p class="sub">'+esc(r.address)+'</p></header><section class="block"><h2>Property details</h2><dl class="info">'+facts.filter(x=>x[1]!=null&&x[1]!=='').map(x=>info(...x)).join('')+'</dl><div class="btnrow">'+btn('reviewProperty','Photos and district laws','layers')+'</div></section>';
       $('back').onclick=()=>{atlas.map.closePopup();if(selected)choose(selected);else reset();};
       $('reviewProperty').onclick=()=>inspectListing(r,'laws',perspective);
