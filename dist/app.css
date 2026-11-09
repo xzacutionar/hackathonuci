@@ -61,3 +61,10 @@ html,body{background:#f7f8f6}.top{height:67px;padding:0 25px;gap:18px}.brand{fon
 @media(prefers-reduced-motion:reduce){#welcome-guide[open]{animation:none}}
 
 .guide-media video[hidden]{display:none}
+
+.housing-map-pin{display:grid;place-items:center;border:2px solid white;border-radius:50%;background:#754a2b;color:white;font:bold 20px/1 sans-serif;box-shadow:0 1px 4px #543c3066}
+.site-thumb{width:64px;height:44px;object-fit:cover;border-radius:4px;flex:none}
+.housing-detail:not(:empty){margin-top:12px;padding-top:12px;border-top:1px solid var(--rule)}
+.housing-detail figure{margin:10px 0}.housing-detail figure img{width:100%;border-radius:5px}
+.housing-detail figcaption,.housing-list small{font-size:11px;color:var(--muted)}
+.housing-list button[aria-pressed=true]{background:#f2efea}

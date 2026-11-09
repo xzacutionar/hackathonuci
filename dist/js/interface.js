@@ -1,3 +1,4 @@
+import {housingSites} from './housing-sites.js';
 import {inspectListing,yieldLabel} from './site-review.js';
 import {opportunities} from './opportunities.js';
 import {amenityIcon} from './amenity-icons.js';
@@ -11,7 +12,7 @@ export function mountLandscout(D,icons,atlasFactory,globeFactory){
   let satelliteFailed=false;
   const photo=createPhotoView($('photoView'),D,()=>modes('3D'));
   let selected=null,imports=[],near=[],nearState='idle',official=D.regions.every(s=>Boolean(s.geometry)),mode='2D',cameraSeq=0,searchSeq=0,nearSeq=0,searchTimer,toastTimer,searchResults=[],globe,atlas;
-  let property=null;
+  let property=null, housing;
   const cameraTarget=()=>property||selected;
   function selectProperty(row){
     if(mode!=='2D')flat();
@@ -60,8 +61,8 @@ export function mountLandscout(D,icons,atlasFactory,globeFactory){
       ]:[['Parcel ID','No parcel selected'],['Land size','Unverified'],['Zoning',s.kind==='region'?'Select a district above':'Unverified'],['Ownership','Unverified'],['Constraints','Unassessed']];
       el.innerHTML='<header class="sideHead"><button class="back" id="back">'+icon('left')+'Back to county overview</button><div class="eyebrow">'+icon('pin')+(imported?'Imported site':s.kind==='place'?'Search result':'Study region')+'</div><h1>'+esc(s.name)+'</h1><p class="sub coords">'+coords(s)+'</p><span class="badge"><i></i>'+esc(s.boundary)+'</span></header><section class="block"><div class="blockHead"><h2>Land information</h2></div><dl class="info">'+landInfo.map(x=>info(...x)).join('')+'</dl>'+(imported?'<p class="empty">File attributes are unverified.'+(s.source?' Source supplied: '+esc(s.source):'')+'</p>':'')+'</section>'+nearbySection()+'<section class="block"><details><summary>Development visualisation</summary><p class="empty">Conceptual models, footprint and density estimates can be attached to a reviewed parcel in a future version. Approval status has not been assessed.</p></details></section><section class="block"><details><summary>Selection data</summary><div class="btnrow">'+btn('saveSelection','Save selection record','download')+btn('import','Import GeoJSON','upload')+'</div></details></section>';
     }
-    el.querySelector('.sideHead').insertAdjacentHTML('afterend','<section id="opportunity-list" class="block listings"></section>');
-    offers?.render(selected,mode);
+    el.querySelector('.sideHead').insertAdjacentHTML('afterend','<section id="opportunity-list" class="block listings"></section><section id="housing-sites" class="block"></section>');
+    offers?.render(selected,mode); housing?.render(selected);
     if(selected?.kind==='region'){const first=el.querySelector('.sideHead');first.insertAdjacentHTML('afterend','<section id="zone-panel" class="block zpanel"></section>');zones?.render();}
     el.querySelectorAll('[data-rec]').forEach(b=>b.addEventListener('click',()=>choose(allRecords().find(s=>s.id===b.dataset.rec))));
     if($('back'))$('back').onclick=reset;if($('import'))$('import').onclick=()=>$('file').click();if($('nearby'))$('nearby').onclick=lookup;if($('saveSelection'))$('saveSelection').onclick=saveRecord;
@@ -141,7 +142,7 @@ export function mountLandscout(D,icons,atlasFactory,globeFactory){
     searchTimer=setTimeout(async()=>{try{const remote=await D.photon(q);if(seq!==searchSeq)return;const rows=[...local,...remote.filter(x=>!local.some(r=>r.name.toLowerCase()===x.name.toLowerCase()))].slice(0,8);results(rows,rows.length?'':'No places found in the Orange County search area.');}catch{if(seq===searchSeq)results(local,'Address service unavailable. Local study regions remain searchable.');}},330);
   }
   const callbacks={district:inspectDistrict,imagery:label=>{if(mode!=='2D'&&!photo.active)$('legendNote').textContent=label;},pick:choose,tip,hideTip,notice,scale,manual:()=>{globe.stop();modes('3D');},failure:()=>photoFallback(mode==='Orbit'?'Orbit':'3D'),basemapChanged:()=>updateCredit()};
-  atlas=atlasFactory($('raster-map'),D,callbacks);globe=globeFactory($('globe'),D,callbacks);globe.setRecords(allRecords(),null,[]);offers=opportunities(atlas.map,D.regions,selectProperty,perspective);zones=zoningInspector(atlas.map,point=>{zoneOrigin={lon:point.lng,lat:point.lat};lookup();});
+  atlas=atlasFactory($('raster-map'),D,callbacks);globe=globeFactory($('globe'),D,callbacks);globe.setRecords(allRecords(),null,[]);housing=housingSites(atlas.map,()=>{property=null;if(mode!=='2D')flat();});offers=opportunities(atlas.map,D.regions,selectProperty,perspective);zones=zoningInspector(atlas.map,point=>{zoneOrigin={lon:point.lng,lat:point.lat};lookup();});
   $('brand').onclick=reset;$('home').onclick=reset;$('two').onclick=flat;$('three').onclick=()=>perspective();$('orbit').onclick=()=>perspective('Orbit');
   $('north').onclick=()=>{if(mode==='2D')notice('North is up in the county atlas.',2000);else if(photo.active){photo.north();modes('3D');}else perspective();};
   $('zoomIn').onclick=()=>(mode==='2D')?atlas.zoomBy(1):(photo.active?photo.zoom(1):globe.zoomBy(1));$('zoomOut').onclick=()=>(mode==='2D')?atlas.zoomBy(-1):(photo.active?photo.zoom(-1):globe.zoomBy(-1));

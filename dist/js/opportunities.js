@@ -75,7 +75,14 @@ export function opportunities(map,regions,showMap,view3D){
     const local=selectedCity?.kind==='region'?rows.filter(r=>r.city===selectedCity.name):rows;
     box.innerHTML='<details><summary>Commercial listings ('+local.length+')</summary><p class="empty">'+(failed?'The listing snapshot could not load.':local.length?'Properties for acquisition and conversion screening.':'No candidates for this city in this listing snapshot.')+'</p>'+local.map(r=>'<button class="listing-row" data-listing="'+escape(r.listing_id)+'">'+pin+'<span><b>'+escape(r.property_name)+'</b><small>'+escape(r.city)+' · '+(r.listing_status?escape(r.listing_status)+' · ':'')+escape(r.asking_price==='Not listed'?'Price undisclosed':r.asking_price)+'</small></span></button>').join('')+'</details>';
     const guideButton=document.createElement('button');guideButton.className='btn';guideButton.textContent='Fast-track site criteria';guideButton.onclick=guide;box.prepend(guideButton);const compare=document.createElement("button");compare.className="btn";compare.textContent="Compare acreage & zoning";compare.disabled=!local.length;compare.onclick=()=>compareListings(local,open);box.prepend(compare);
-    box.querySelectorAll('[data-listing]').forEach(b=>b.onclick=()=>open(rows.find(r=>r.listing_id===b.dataset.listing)));
+    box.querySelectorAll('[data-listing]').forEach(b=>{
+      const id=b.dataset.listing;
+      b.onclick=()=>open(rows.find(r=>r.listing_id===id));
+      photoRecords(id).then(records=>{
+        if(!b.isConnected||!records.length)return;
+        const thumb=b.querySelector('img');thumb.className='site-thumb';thumb.loading='lazy';thumb.src=thumbnailUrl(records[0]);
+      }).catch(()=>{});
+    });
   }
   fetch('/data/commercial-listings.json').then(r=>{if(!r.ok)throw Error();return r.json();}).then(records=>{
     rows=records;
