@@ -12,7 +12,11 @@
       root.dataset.theme = theme;
       window.dispatchEvent(new Event('landscout-theme'));
     }
-    document.getElementById('theme-toggle')?.setAttribute('aria-pressed', String(dark));
+    const toggle = document.getElementById('theme-toggle');
+    if (toggle) {
+      toggle.setAttribute('aria-checked', String(dark));
+      toggle.querySelector('.mode-state').textContent = dark ? 'On' : 'Off';
+    }
     const select = document.getElementById('theme-choice');
     if (select) select.value = choice;
   }

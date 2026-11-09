@@ -69,7 +69,12 @@ html,body{background:#f7f8f6}.top{height:67px;padding:0 25px;gap:18px}.brand{fon
 .housing-detail figcaption,.housing-list small{font-size:11px;color:var(--muted)}
 .housing-list button[aria-pressed=true]{background:#f2efea}
 
-#theme-toggle{flex:none}
+#theme-toggle{display:inline-flex;align-items:center;gap:7px;flex:none;border:1px solid var(--rule);background:var(--paper);color:var(--ink);border-radius:8px;min-height:38px;padding:4px 8px;font-size:12px;font-weight:650;white-space:nowrap}
+.mode-state{display:inline-flex;align-items:center;justify-content:flex-end;position:relative;width:43px;height:22px;border-radius:12px;padding:0 5px;background:#4b5b65;color:white;font-size:11px}
+.mode-state::before{content:"";position:absolute;left:4px;width:13px;height:13px;border-radius:50%;background:white}
+#theme-toggle[aria-checked=true] .mode-state{justify-content:flex-start;background:#176646}
+#theme-toggle[aria-checked=true] .mode-state::before{left:auto;right:4px}
+
 #theme-choice{padding:.35em;border:1px solid var(--rule);border-radius:5px}
 :root[data-theme=dark]{color-scheme:dark;--ink:#f2f7fa;--muted:#bfccd5;--blue:#99d9ff;--rule:#586b79;--faint:#24333e;--bluewash:#24485b;--paper:#15212b;--shadow:0 3px 14px #0008;--base:#0e1821;--raised:#23333e;--green:#a2efc2}
 html[data-theme=dark] body{background:var(--base);color:var(--ink)}
@@ -78,7 +83,7 @@ html[data-theme=dark] body{background:var(--base);color:var(--ink)}
 [data-theme=dark] :is(.find input,.seg button,.baseSwitch button,.city small,.city .arrow,.sub,.coords,.brand .ai,.property-pop dt,.property-pop small,.property-date,.photo-controls span,.listing-gallery figcaption,#guide-back,#guide-skip){color:var(--muted)}
 [data-theme=dark] :is(.leaflet-container a,.zpanel a,.listings a,.property-pop a,.listing-link,.credit a){color:var(--blue)}
 [data-theme=dark] :is(.unit-est h3,.property-laws .district-label,#guide-count,.guide-top strong span){color:var(--green)}
-[data-theme=dark] :is(.seg button,.baseSwitch button,#theme-toggle,.housing-list button)[aria-pressed=true],[data-theme=dark] :is(.btn,.mapBtn,.iconBtn,.city,.listing-row,.sideHead .back):hover{background:var(--bluewash);color:#fff}
+[data-theme=dark] :is(.seg button,.baseSwitch button,.housing-list button)[aria-pressed=true],[data-theme=dark] :is(.btn,.mapBtn,.iconBtn,.city,.listing-row,.sideHead .back):hover{background:var(--bluewash);color:#fff}
 [data-theme=dark] :is(#guide-next,.btn.primary){background:#14513d;color:white;border-color:#8adab0}
 [data-theme=dark] #guide-steps button[aria-current=step]::after{background:#9bf1bc}
 [data-theme=dark] :focus-visible{outline:3px solid #ffdb75;outline-offset:2px}
@@ -87,6 +92,8 @@ html[data-theme=dark] body{background:var(--base);color:var(--ink)}
 [data-theme=dark] .street-style :is(.leaflet-image-layer,.leaflet-tile-pane .leaflet-tile){filter:none}
 [data-theme=dark] .street-style .place-label{color:#fff4bd;text-shadow:0 1px 3px #000,1px 0 2px #000,-1px 0 2px #000}
 [data-theme=dark] .compass svg{filter:brightness(1.9)}
-@media(max-width:660px){#theme-toggle,.top #settings{width:32px;flex:none}.top .find{min-width:0}}
+@media(max-width:660px){.top #settings{width:32px;flex:none} #theme-toggle{padding:3px 6px;gap:4px}.top .find{min-width:0}}
 [data-theme=dark] :is(.toast,.photo-target){background:var(--paper);color:var(--ink);border-color:var(--rule)}
 [data-theme=dark] .mapkey small,[data-theme=dark] .tooltip small{color:var(--muted)}
+
+@media(max-width:500px){.top{flex-wrap:wrap;height:auto;padding-block:5px;gap:5px 8px}.top .find{flex:1 0 100%;order:1}.top #guide-open{margin-left:auto}}
