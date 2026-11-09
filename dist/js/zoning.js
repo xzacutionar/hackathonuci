@@ -55,14 +55,20 @@ export function createZoneLookup(model){
  };
 }
 export function zoningInspector(map,onPoint){
+ const edge = selected => document.documentElement.dataset.theme === 'dark'
+   ? (selected ? '#ffec9f' : '#cad6df') : (selected ? '#362048' : '#63576a');
  const pane=map.createPane('zoning');pane.style.zIndex='435';
  const renderer=L.canvas({pane:'zoning',padding:.3}),layer=L.layerGroup().addTo(map);
  let overlaps=[],city=null,data=null,focus=null,highlight=null,sequence=0,failed=false,refs=null;
+ window.addEventListener('landscout-theme',()=>{
+   layer.eachLayer(group=>group.setStyle({color:edge(false)}));
+   highlight?.setStyle({color:edge(true)});
+ });
  catalogue.then(v=>{refs=v;render();}).catch(()=>{});
  function selectFeature(feature,path,latlng){
    overlaps=latlng?data.features.filter(f=>f!==feature&&contains(f.geometry,[latlng.lng,latlng.lat])):[];
-   if(highlight)highlight.setStyle({weight:1,color:'#63576a'});
-   focus=feature;highlight=path;path.setStyle({weight:3,color:'#362048'});path.bringToFront();render();onPoint(latlng||path.getBounds().getCenter());
+   if(highlight)highlight.setStyle({weight:1,color:edge(false)});
+   focus=feature;highlight=path;path.setStyle({weight:3,color:edge(true)});path.bringToFront();render();onPoint(latlng||path.getBounds().getCenter());
  }
  // Hover and click resolve overlaps to the same smallest district.
  function districtAt(ll){
@@ -106,7 +112,7 @@ export function zoningInspector(map,onPoint){
      if(!point)return;
      const ll=L.latLng(point[1],point[0]),path=districtAt(ll);
      if(path)selectFeature(path.feature,path,ll);
-     else {if(highlight)highlight.setStyle({weight:1,color:'#63576a'});focus=null;highlight=null;overlaps=[];render();}
+     else {if(highlight)highlight.setStyle({weight:1,color:edge(false)});focus=null;highlight=null;overlaps=[];render();}
    }
    if(point&&s===city&&data){inspectPoint();return;}
 
@@ -116,7 +122,7 @@ export function zoningInspector(map,onPoint){
    const key=city.id;
    cityZones(key).then(fc=>{
      if(id!==sequence)return;data=fc;
-     L.geoJSON(fc,{renderer,pane:'zoning',style:f=>({color:'#63576a',weight:1,fillOpacity:.5,fillColor:colors[family(f.properties.name)]}),onEachFeature:(f,path)=>{
+     L.geoJSON(fc,{renderer,pane:'zoning',style:f=>({color:edge(false),weight:1,fillOpacity:.5,fillColor:colors[family(f.properties.name)]}),onEachFeature:(f,path)=>{
        path.on('click',e=>{L.DomEvent.stopPropagation(e.originalEvent);selectFeature(f,path,e.latlng);});
      }}).addTo(layer);render();inspectPoint();
    }).catch(()=>{if(id===sequence){failed=true;render();}});

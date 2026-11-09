@@ -72,11 +72,14 @@ export function createRaster(container,D,callbacks){
     const region=D.regions.find(s=>s.geometry&&contains(s.geometry,point));
     return region&&region!==selected?region:null;
   }
+  const edge = active => document.documentElement.dataset.theme === 'dark'
+    ? (active ? '#fff2b2' : '#d3c3f5') : (active ? '#552d7e' : '#785399');
+  window.addEventListener('landscout-theme',draw);
   function highlight(area){
     if(area===hoveredArea)return;
-    if(hoveredArea)cityPaths.get(hoveredArea)?.setStyle({weight:1.8,color:'#785399',fillOpacity:.5});
+    if(hoveredArea)cityPaths.get(hoveredArea)?.setStyle({weight:1.8,color:edge(false),fillOpacity:.5});
     hoveredArea=area;
-    if(area)cityPaths.get(area)?.setStyle({weight:3.2,color:'#512d79',fillOpacity:.65});
+    if(area)cityPaths.get(area)?.setStyle({weight:3.2,color:edge(true),fillOpacity:.65});
     container.style.cursor=area?'pointer':'';
     if(!area)callbacks.hideTip();
   }
@@ -97,8 +100,8 @@ export function createRaster(container,D,callbacks){
       const active=selected?.id===s.id;
       if(s.geometry&&(s.kind==='parcel'||settings.regions)){
         L.geoJSON(s.geometry,{interactive:false,style:{color:'#55515b',weight:active?5:3.8,opacity:.8,fill:false,smoothFactor:.7}}).addTo(boundaries);
-        const l=L.geoJSON(s.geometry,{style:{color:active?'#552d7e':'#785399',weight:active?2.8:1.8,dashArray:'5 4',opacity:1,fillColor:s.color,fillOpacity:active&&s.kind==='region'?0:.5,smoothFactor:.7}}).addTo(boundaries);
-        cityPaths.set(s,l);bindPick(l,s);l.on('mouseover',()=>l.setStyle({weight:3,color:'#512d79'}));l.on('mouseout',()=>l.setStyle({weight:active?2.8:1.8,color:active?'#552d7e':'#785399'}));
+        const l=L.geoJSON(s.geometry,{style:{color:edge(active),weight:active?2.8:1.8,dashArray:'5 4',opacity:1,fillColor:s.color,fillOpacity:active&&s.kind==='region'?0:.5,smoothFactor:.7}}).addTo(boundaries);
+        cityPaths.set(s,l);bindPick(l,s);l.on('mouseover',()=>l.setStyle({weight:3,color:edge(true)}));l.on('mouseout',()=>l.setStyle({weight:active?2.8:1.8,color:edge(active)}));
       }
       if(settings.labels||active){
         const marker=L.marker([s.lat,s.lon],{title:s.name,alt:s.name,keyboard:true,zIndexOffset:active?500:1,icon:L.divIcon({className:'map-label'+(active?' is-current':''),html:'<span class="place-label">'+escape(s.name)+'</span>',iconSize:[1,1],iconAnchor:[0,-1]})}).addTo(markers);
