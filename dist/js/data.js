@@ -1,5 +1,5 @@
 export function dataLayer(regs, images){
-  const regionColors={ANA:'#a4df8b',SA:'#eda885',CM:'#f1e388',GG:'#a6a8ee',IRV:'#d399e8',LF:'#85cce7'};
+  const regionColors={ANA:'#a4df8b',SA:'#eda885',CM:'#f1e388',GG:'#a6a8ee',IRV:'#d399e8',LF:'#85cce7',LN:'#eda3c0'};
   const regions=regs.map(r=>({...r,geometry:null,color:regionColors[r.id],kind:'region',boundary:'Study location'}));
   const cityInfo='https://data.ca.gov/@california-department-of-technology/california-city-boundaries-and-identifiers';
   function distance(a,b,c,d){
@@ -35,7 +35,7 @@ export function dataLayer(regs, images){
     const res=await json('/data/municipalities.geojson');
     const found=regions.map(r=>res.features?.find(f=>String(f.properties?.CDTFA_CITY||'').toLowerCase()===r.name.toLowerCase()&&validated(f.geometry)));
     if(!found.every(Boolean))return false;
-    regions.forEach((r,i)=>{r.geometry=found[i].geometry;r.boundary='Municipal boundary';});
+    regions.forEach((r,i)=>{r.geometry=found[i].geometry;r.source=found[i].properties.source||cityInfo;r.boundary='Municipal boundary';});
     return true;
   }
   const categories=['Schools','Health','Transport','Shopping','Employment'];

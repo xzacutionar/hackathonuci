@@ -53,7 +53,7 @@ export function mountLandscout(D,icons,atlasFactory,globeFactory){
       return;
     }
     if(!selected){
-      el.innerHTML='<header class="sideHead"><div class="eyebrow">'+icon('layers')+'County overview</div><h1>Orange County</h1><p class="sub">California, United States</p></header><section class="block"><div class="blockHead"><h2>Study regions</h2><span class="count">6 regions</span></div><p class="empty">Select a city to explore its zoning districts.</p>'+D.regions.map(listRow).join('')+'</section>'+fileSection()+'<section class="block"><h2>Boundary source</h2><p class="boxNote">'+(official?'City limits are sourced from the California Department of Technology. Parcel boundaries can be imported separately.':'Study locations are shown as pins while city limits are unavailable.')+'</p></section>';
+      el.innerHTML='<header class="sideHead"><div class="eyebrow">'+icon('layers')+'County overview</div><h1>Orange County</h1><p class="sub">California, United States</p></header><section class="block"><div class="blockHead"><h2>Study regions</h2><span class="count">'+D.regions.length+' regions</span></div><p class="empty">Select a city to explore its zoning districts.</p>'+D.regions.map(listRow).join('')+'</section>'+fileSection()+'<section class="block"><h2>Boundary source</h2><p class="boxNote">'+(official?'City limits are sourced from the California Department of Technology and the City of Laguna Niguel. Parcel boundaries can be imported separately.':'Study locations are shown as pins while city limits are unavailable.')+'</p></section>';
     }else{
       const s=selected,imported=s.kind==='parcel',landInfo=imported?[
         ['Parcel ID',s.parcelId||'Not supplied'],['Land size',s.area!=null?s.area.toLocaleString()+' ac · file value':'Unverified'],['Zoning','Unverified'],['Ownership','Unverified'],['Constraints','Unassessed']
@@ -66,9 +66,9 @@ export function mountLandscout(D,icons,atlasFactory,globeFactory){
     el.querySelectorAll('[data-rec]').forEach(b=>b.addEventListener('click',()=>choose(allRecords().find(s=>s.id===b.dataset.rec))));
     if($('back'))$('back').onclick=reset;if($('import'))$('import').onclick=()=>$('file').click();if($('nearby'))$('nearby').onclick=lookup;if($('saveSelection'))$('saveSelection').onclick=saveRecord;
     $('legendTitle').textContent=(mode!=='2D'&&property?property:selected)?.name||'Orange County';
-    $('legendNote').textContent=selected?selected.boundary:(official?'Municipal boundaries · 6 study regions':'6 study locations');
+    $('legendNote').textContent=selected?selected.boundary:(official?'Municipal boundaries · '+D.regions.length+' study regions':D.regions.length+' study locations');
     if(mode!=='2D')$('legendNote').textContent=photo.active?'Aerial perspective · flat terrain':globe.imageryStatus;
-    $('sourceNote').innerHTML='Photography: USDA / USGS The National Map. Offshore context: NASA Blue Marble. Street map: OpenFreeMap Liberty with USGS Topo coverage. Place records: California public schools, CDPH, OCTA and <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap contributors (ODbL)</a>. City limits: <a href="'+D.cityInfo+'" target="_blank" rel="noopener">California Department of Technology</a>. City limits do not establish development eligibility.';
+    $('sourceNote').innerHTML='Photography: USDA / USGS The National Map. Offshore context: NASA Blue Marble. Street map: OpenFreeMap Liberty with USGS Topo coverage. Place records: California public schools, CDPH, OCTA and <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap contributors (ODbL)</a>. City limits: <a href="'+D.cityInfo+'" target="_blank" rel="noopener">California Department of Technology</a> and the City of Laguna Niguel. City limits do not establish development eligibility.';
   }
   function updateCredit(){
     const street=mode==='2D'&&atlas.basemap==='streets';
@@ -79,7 +79,7 @@ export function mountLandscout(D,icons,atlasFactory,globeFactory){
   function modes(next){const refreshPanel=(mode==='2D')!==(next==='2D');mode=next;globe?.clearHover();if(refreshPanel&&property){panel();$('panel').scrollTop=0;}$('legendTitle').textContent=(mode!=='2D'&&property?property:selected)?.name||'Orange County';$('orbit').textContent=next==='Orbit'?'Stop orbit':property?'Orbit property':'Orbit';offers?.mode(selected,mode);for(const [id,m] of [['two','2D'],['three','3D'],['orbit','Orbit']])$(id).setAttribute('aria-pressed',String(m===next));updateCredit();}
   function flat(){
     ++cameraSeq;photo.close();globe?.stop();$('globe').hidden=true;$('atlas').hidden=false;hideTip();modes('2D');atlas.resize();
-    $('legendNote').textContent=selected?selected.boundary:'6 study regions';
+    $('legendNote').textContent=selected?selected.boundary:D.regions.length+' study regions';
   }
   function photoFallback(wanted='3D'){
     satelliteFailed=true;globe.stop();$('globe').hidden=true;$('atlas').hidden=true;hideTip();photo.show(cameraTarget(),wanted==='Orbit');modes(wanted);
@@ -127,7 +127,7 @@ export function mountLandscout(D,icons,atlasFactory,globeFactory){
     catch{if(seq!==nearSeq||selected!==target)return;nearState='failed';}
     panel();
   }
-  function saveRecord(){if(!selected)return;const s=selected;const data={name:s.name,coordinates:[s.lon,s.lat],type:s.kind,boundary_status:s.boundary,parcel_id:s.parcelId||null,reported_acres_unverified:s.area??null,legal_status:'not_assessed',source:s.kind==='region'&&official?D.cityInfo:s.source||null};const a=document.createElement('a'),u=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}));a.href=u;a.download='landscout-selection.json';a.click();setTimeout(()=>URL.revokeObjectURL(u),1000);}
+  function saveRecord(){if(!selected)return;const s=selected;const data={name:s.name,coordinates:[s.lon,s.lat],type:s.kind,boundary_status:s.boundary,parcel_id:s.parcelId||null,reported_acres_unverified:s.area??null,legal_status:'not_assessed',source:s.source||null};const a=document.createElement('a'),u=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}));a.href=u;a.download='landscout-selection.json';a.click();setTimeout(()=>URL.revokeObjectURL(u),1000);}
   function closeSearch(){searchSeq++;clearTimeout(searchTimer);$('results').hidden=true;$('query').setAttribute('aria-expanded','false');}
   function results(items,msg){
     searchResults=items;$('results').hidden=false;$('query').setAttribute('aria-expanded','true');

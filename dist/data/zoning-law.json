@@ -228,6 +228,83 @@
           "url": "https://ecode360.com/43971999"
         }
       ]
+    },
+    "LN": {
+      "title": "Laguna Niguel Zoning Code",
+      "url": "https://www.cityoflagunaniguel.org/133/Zoning",
+      "rules": [
+        {
+          "codes": [
+            "RS-1",
+            "RS-2",
+            "RS-3",
+            "RS-4",
+            "RP",
+            "RA",
+            "RM"
+          ],
+          "benefit": "Table 3.1 in § 9-1-32 lists permitted, accessory and conditional uses by residential district. Read the column for the mapped code.",
+          "caution": "Check the proposed dwelling type and the applicable development standards in Table 3.2. Planned residential sites may have project-specific standards.",
+          "url": "https://codelibrary.amlegal.com/codes/lagunaniguelca/latest/lagunaniguel_ca/0-0-0-25330"
+        },
+        {
+          "codes": [
+            "CN",
+            "CC",
+            "CO",
+            "BP",
+            "PI",
+            "MU-TC"
+          ],
+          "benefit": "Table 4.1 in § 9-1-42 identifies the relevant uses and permit categories for this district.",
+          "caution": "Check the specific proposed use, applicable development standards and any required site development permit before estimating housing potential.",
+          "url": "https://codelibrary.amlegal.com/codes/lagunaniguelca/latest/lagunaniguel_ca/0-0-0-26142"
+        },
+        {
+          "codes": [
+            "OS",
+            "PR",
+            "OS/PR"
+          ],
+          "benefit": "Table 5.1 in § 9-1-52 separates the uses of open space and parks and recreation districts.",
+          "caution": "Confirm which designation applies at the site and check its column in the use table.",
+          "url": "https://codelibrary.amlegal.com/codes/lagunaniguelca/latest/lagunaniguel_ca/0-0-0-26675"
+        },
+        {
+          "codes": [
+            "CN/MC",
+            "CC/MC",
+            "PI/RM/PRMC",
+            "RP/OS"
+          ],
+          "benefit": "The mapped code combines multiple designations. Use the city map to identify the provisions that cover the specific parcel.",
+          "caution": "Confirm the base district boundaries and any applicable overlay with City Planning before applying a use table.",
+          "url": "https://www.cityoflagunaniguel.org/133/Zoning"
+        },
+        {
+          "codes": [
+            "SLSP",
+            "ACLCP",
+            "ACLCP/OS",
+            "MU",
+            "RC",
+            "CS"
+          ],
+          "benefit": "The GIS designation is a starting point for locating the applicable city code or plan.",
+          "caution": "Confirm the governing plan, overlays and current use provisions with City Planning.",
+          "url": "https://www.cityoflagunaniguel.org/133/Zoning"
+        },
+        {
+          "codes": [
+            "street",
+            "WATER",
+            "NO DESIG"
+          ],
+          "benefit": "The city GIS identifies this area separately from ordinary development districts.",
+          "caution": "No housing yield is assigned to this feature. Verify the mapped designation before screening a parcel.",
+          "url": "https://www.cityoflagunaniguel.org/133/Zoning"
+        }
+      ]
     }
   },
   "pathways": [
